@@ -14,7 +14,7 @@ compile '/stylesheet/' do
   # don't filter or layout
 end
 
-compile '/images/*' do
+compile '/images/*/' do
 end
 
 compile '/' do
@@ -22,9 +22,19 @@ compile '/' do
   layout 'default'
 end
 
-compile '*' do
+compile '/pages/*' do
   filter :erb
   layout 'page'
+end
+
+compile '/articles/*' do
+  filter :redcloth
+  layout 'article'
+end
+
+compile '*' do
+  filter :erb
+  layout 'default'
 end
 
 route '/stylesheet/' do

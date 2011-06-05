@@ -332,8 +332,7 @@ body
 {
 	position: absolute;
 	top: 255px;
-	background: #646464;
-	height: 180px;
+	background: #fff;
 	width: 100%;
 }
 
@@ -402,7 +401,7 @@ body
 
 #lowest_mid
 {
-	position: absolute;
+	position: inherit;
 	top: 435px;
 	width: 100%;
 	background: #dedede;
@@ -734,4 +733,10 @@ body
 	font: bold 0.75em tahoma, sans-serif;
 	color: #f00;
 	padding-bottom: 10px;
+}
+
+#article_content {
+    font-size: medium;
+    padding-left: 5em;
+    width: 60em;
 }
