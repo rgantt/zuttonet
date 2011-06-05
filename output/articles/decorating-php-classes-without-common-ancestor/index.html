@@ -1,0 +1,73 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>ZuttoNet - Decorating PHP classes without a common ancestor</title>
+
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name="Title" content="ZuttoNet Web Development" />
+		<meta name="Author" content="ZuttoNet" />
+		<meta name="copyright" content="2007-2011 ZuttoNet WebMedia" />
+		<meta name="Language" content="en" />
+		<meta name="robots" content="index,follow" />
+
+		<link rel="stylesheet" type="text/css" media="screen" href="/main/style.css" />
+		<link rel="shortcut icon" href="/images/favicon.ico" />
+
+		<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			_uacct = "UA-2356219-1";
+			urchinTracker();
+		</script>
+	</head>
+
+	<body>
+		<div id="wrapper">
+			<div id="top_mid"></div>
+
+			<div id="top_nav">
+				<div class="menu">
+					<ul>
+						<li><a href="/">home</a></li>
+						<li><a href="/pages/projects">projects</a></li>
+						<li><a href="/pages/contact">contact</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+
+			<div id="middle_content_half">
+				<div id="middle_left_half"></div>
+				<div id="middle_right_half"></div>
+			</div>
+
+			<div id="middle_content_half_lower"></div>
+
+			<div id="middle_content_half_mid"></div>
+
+			<div id="content_sub">            
+                <div id="article_content">
+                    <h2>Decorating PHP classes without a common ancestor</h2>
+                    <h3>By Ryan Gantt on  in php, patterns, oop, overloading</h3>
+                    
+                    <p>To change the functionality of the component, the decorator redefines one or more methods; within these methods, some piece of functionality is added or modified, and the result is passed back through to the decorated class. All other method calls are automatically passed through to the component class.</p>
+<p><img src="/images/articles/decorator-abstract.png" title="Abstract decorator pattern, shown with common ancestor" alt="Abstract decorator pattern, shown with common ancestor" /></p>
+<p>This is all very neat and useful, but I&#8217;ve found myself in situations before where it doesn&#8217;t make sense to include the decorator in the same inheritance hierarchy as the decorated class. For example, I may want my decorator class to inherit from some other class. In <span class="caps">PHP</span>, this limitation can be overcome through use of the built-in <a href="http://www.php.net/call_user_func_array">call_user_func_array</a> function in conjunction with the <a href="http://php.net/manual/en/language.oop5.overloading.php">__call</a> magic method.</p>
+<p><img src="/images/articles/decorator-no-common-ancestor.png" title="Decorator with no common ancestor" alt="Decorator with no common ancestor" /></p>
+<p>Take the Textile markup library, for example. It&#8217;s an extremely useful piece of software. However, it&#8217;s all wrapped up into a single class. It effectively operates as a single unit. All of its methods are public, so in principle we could simply inherit from Textile and overwrite where appropriate. However, this would require us to continue subclassing for every single decoration that we want to apply. Decorating is a bit more agnostic to the class hierarchy; we can add any decorators we want to specific instances of the class and leave other decorators off.</p>
+<p>In <a href="http://www.github.com/gavinchi/sextile">sextile</a>, for example, I decorate the Textile markup class in order to add LaTeX compatibility at runtime. Originally, I went into the Textile 2.0 class itself and hard-coded my own rule. This worked great, until Textile 2.2 was released. In order to use the new features, I would have had to delve into the new code and find out how to add my exception in again. By moving the LaTeX-handling code out into a decorator, I&#8217;m now able to drop different versions of Textile in without worrying about it&#8212;at least provided that the markup mechanism for images hasn&#8217;t changed  between releases.</p>
+<script src="https://gist.github.com/1009388.js"> </script><p>Of course, the alternative to this would be a situation where <code>sextile</code> simply inherits from <code>Textile</code>. In this case, the <code>TextileThis</code> method would simply be written as a call to <code>parent::TextileThis(...)</code> with the wrapper applied to the first parameter. If I wanted to add an additional decorator which modifies hyperlinks (which, in some cases, I do), I would have to subclass this class in a similar manner. Such behavior wouldn&#8217;t be unheard of in, for example, a wiki environment where mathematical markup is needed, and all relative links should go to a predefined location. Decorating, instead of subclassing, allows me to plug in either of these bits of functionality as needed, independently of one another.</p>
+<p>So what is this business about not having a common ancestor? Well, one caveat of the decorator pattern is that the decorator and the concrete class both implement the same abstract class or interface. In the example above, there were two options: create a <code>Textile</code> subclass to serve as the common parent class for all possible decorators. This is one option, and would be tantamount to introducing a common ancestor into the inheritance hierarchy. However, it would also an extra class to the hierarchy. In the name of parsimony, we can use the flexibility of <span class="caps">PHP</span> to achieve the same effect while only adding a single class.</p>
+<p>The <a href="http://www.php.net/call_user_func_array">call_user_func_array</a> function accepts two parameters: a callback function (in the case of a function, this is simply a string; in the case of a method, this requires an array containing the instance of the class and the name of the method) and an array of parameters to pass to that function. This means that we can call any method at runtime, provided that we have its name or an instance of its containing class. In conjunction with the <code>__call</code> magic method available to classes in PHP5, we can intercept method calls to an object and redirect them anywhere we please. That means that, although <code>sextile</code> and <code>Textile</code> have different class signatures, they can serve the same purpose in any situation. This helps us with decorators because it allows us to pass non-decorated method calls through to the concrete instance of the decorated class. In a situation where one is interested in decorating <em>all</em> methods of a class with a common functionality change, this would be a huge benefit. For example, adding logging at runtime.</p>
+<p>One thing to remember about using <code>__call</code> in combination with <code>call_user_func_array</code> would be that type hints and calls to the <code>instanceof</code> operator will fail when comparing instances of class <code>Textile</code> to instances of class <code>sextile</code>. This is an unintended negative consequence of forgoing a common ancestor.</p>
+<p>Note that by forgoing a common parent for the decorator classes, we are forced to add this <code>__call</code> method to every single decorator. This would constitute a pretty clear violation of the <a href="http://c2.com/cgi/wiki?DontRepeatYourself"><span class="caps">DRY</span></a> principle, because the same code would exist in multiple classes. I would argue for using your marginal instinct in this case; if you have a handful of decorators, the benefits of duplication might outweigh the costs of maintaining another class. In the case of many possible decorators, the <a href="http://c2.com/xp/CodeSmell.html">smelly code</a> might merit a refactoring to a higher place in the hierarchy. Personally I think my balance point would be around 2-3 decorators.</p>
+                </div>
+
+				<div style="float: left; width: 100%; background-color: #fff; border-width: 0; border-style: none; border-top: 1px solid #8E8E8E; margin-top: 15px;">
+					<div id="footer">
+						<a href="/">HOME</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/projects">PROJECTS</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/contact">CONTACT</a>
+					</div>
+				</div> 
+			</div>
+	</body>
+</html>

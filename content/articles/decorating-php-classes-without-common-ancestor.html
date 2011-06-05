@@ -1,0 +1,32 @@
+---
+kind: article
+title: Decorating PHP classes without a common ancestor
+tags: php, patterns, oop, overloading
+created_at: Time.parse( "March 15, 2011" )
+author: Ryan Gantt
+excerpt: The decorator--or wrapper--pattern is most often used to extend the functionality of the public interface of a specific instance of a class at runtime (rather than at definition-time). Because the behavior is changed at runtime, it allows the functionality of objects instantiated from classes in other libraries, even ones to whose source you may not have access, to be modified. Most commonly, the decorator pattern is described as a pair of classes--a component and a decorator--which derive from a common ancestor. 
+---
+
+To change the functionality of the component, the decorator redefines one or more methods; within these methods, some piece of functionality is added or modified, and the result is passed back through to the decorated class. All other method calls are automatically passed through to the component class.
+
+!=/images/articles/decorator-abstract.png(Abstract decorator pattern, shown with common ancestor)!
+
+This is all very neat and useful, but I've found myself in situations before where it doesn't make sense to include the decorator in the same inheritance hierarchy as the decorated class. For example, I may want my decorator class to inherit from some other class. In PHP, this limitation can be overcome through use of the built-in "call_user_func_array":http://www.php.net/call_user_func_array function in conjunction with the "__call":http://php.net/manual/en/language.oop5.overloading.php magic method.
+
+!=/images/articles/decorator-no-common-ancestor.png(Decorator with no common ancestor)!
+
+Take the Textile markup library, for example. It's an extremely useful piece of software. However, it's all wrapped up into a single class. It effectively operates as a single unit. All of its methods are public, so in principle we could simply inherit from Textile and overwrite where appropriate. However, this would require us to continue subclassing for every single decoration that we want to apply. Decorating is a bit more agnostic to the class hierarchy; we can add any decorators we want to specific instances of the class and leave other decorators off.
+
+In "sextile":http://www.github.com/gavinchi/sextile, for example, I decorate the Textile markup class in order to add LaTeX compatibility at runtime. Originally, I went into the Textile 2.0 class itself and hard-coded my own rule. This worked great, until Textile 2.2 was released. In order to use the new features, I would have had to delve into the new code and find out how to add my exception in again. By moving the LaTeX-handling code out into a decorator, I'm now able to drop different versions of Textile in without worrying about it--at least provided that the markup mechanism for images hasn't changed  between releases.
+
+<script src="https://gist.github.com/1009388.js"> </script>
+
+Of course, the alternative to this would be a situation where @sextile@ simply inherits from @Textile@. In this case, the @TextileThis@ method would simply be written as a call to @parent::TextileThis(...)@ with the wrapper applied to the first parameter. If I wanted to add an additional decorator which modifies hyperlinks (which, in some cases, I do), I would have to subclass this class in a similar manner. Such behavior wouldn't be unheard of in, for example, a wiki environment where mathematical markup is needed, and all relative links should go to a predefined location. Decorating, instead of subclassing, allows me to plug in either of these bits of functionality as needed, independently of one another.
+
+So what is this business about not having a common ancestor? Well, one caveat of the decorator pattern is that the decorator and the concrete class both implement the same abstract class or interface. In the example above, there were two options: create a @Textile@ subclass to serve as the common parent class for all possible decorators. This is one option, and would be tantamount to introducing a common ancestor into the inheritance hierarchy. However, it would also an extra class to the hierarchy. In the name of parsimony, we can use the flexibility of PHP to achieve the same effect while only adding a single class.
+
+The "call_user_func_array":http://www.php.net/call_user_func_array function accepts two parameters: a callback function (in the case of a function, this is simply a string; in the case of a method, this requires an array containing the instance of the class and the name of the method) and an array of parameters to pass to that function. This means that we can call any method at runtime, provided that we have its name or an instance of its containing class. In conjunction with the @__call@ magic method available to classes in PHP5, we can intercept method calls to an object and redirect them anywhere we please. That means that, although @sextile@ and @Textile@ have different class signatures, they can serve the same purpose in any situation. This helps us with decorators because it allows us to pass non-decorated method calls through to the concrete instance of the decorated class. In a situation where one is interested in decorating _all_ methods of a class with a common functionality change, this would be a huge benefit. For example, adding logging at runtime.
+
+One thing to remember about using @__call@ in combination with @call_user_func_array@ would be that type hints and calls to the @instanceof@ operator will fail when comparing instances of class @Textile@ to instances of class @sextile@. This is an unintended negative consequence of forgoing a common ancestor.
+
+Note that by forgoing a common parent for the decorator classes, we are forced to add this @__call@ method to every single decorator. This would constitute a pretty clear violation of the "DRY":http://c2.com/cgi/wiki?DontRepeatYourself principle, because the same code would exist in multiple classes. I would argue for using your marginal instinct in this case; if you have a handful of decorators, the benefits of duplication might outweigh the costs of maintaining another class. In the case of many possible decorators, the "smelly code":http://c2.com/xp/CodeSmell.html might merit a refactoring to a higher place in the hierarchy. Personally I think my balance point would be around 2-3 decorators.
