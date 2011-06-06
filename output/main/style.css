@@ -24,18 +24,31 @@ blockquote p cite {
 	font-style: normal;
 }
 
-body
-{
+body {
 	margin: 0;
 	padding: 0;
 	background-color: #fff;
 	font: 0.75em tahoma, sans-serif;
 }
 
-#wrapper
-{
+#wrapper {
 	height: 100%;
 	width: 100%;
+}
+
+#footer-container {
+    float: left; 
+    width: 100%; 
+    background-color: #fff; 
+    border-width: 0; 
+    border-style: none; 
+    border-top: 1px solid #8E8E8E; 
+    margin-top: 15px;
+}
+
+#footer-container span {
+    font-size: smaller;
+    padding-left: 1em;
 }
 
 #footer {
@@ -51,6 +64,8 @@ body
 	color: #545454;
 	text-decoration: none;
 	font: 0.8em tahoma, sans-serif;
+    padding-right:1em;
+    padding-left:1em;
 }
 #footer a:hover {
 	color: #EF7710;
