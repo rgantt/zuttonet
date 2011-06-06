@@ -22,6 +22,12 @@ compile '/' do
   layout 'default'
 end
 
+compile '/resume/style/' do
+end
+
+compile '/resume/*' do
+end
+
 compile '/pages/*' do
   filter :erb
   layout 'page'
@@ -39,6 +45,10 @@ end
 
 route '/stylesheet/' do
   '/main/style.css'
+end
+
+route '/resume/style/' do
+  '/resume/style.css'
 end
 
 route '/images/*' do
