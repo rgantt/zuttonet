@@ -12,6 +12,12 @@ blockquote {
 	color: white;
 }
 
+.table_cell a {
+    color: #FFA800;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
 blockquote p cite {
 	display: block;
 	text-align: right;
@@ -313,6 +319,12 @@ body
 	top: 255px;
 	background: #fff;
 	width: 100%;
+}
+
+#lower_content a {
+    text-decoration: underline;
+    font-weight: bold;
+    color: #FFA800;    
 }
 
 #news_feed
