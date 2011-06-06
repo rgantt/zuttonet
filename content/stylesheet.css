@@ -32,27 +32,6 @@ body
 	width: 100%;
 }
 
-#musings {
-	z-index: 2;
-	position: absolute;
-	top: 70px;
-	left: 550px;
-	width: 514px;
-	padding: 15px;
-	background-color: #fff;
-	color: #666;
-	border: 1px solid #646464;
-	border-bottom: 0px;
-	margin-bottom: 0px;
-}
-
-.news_post {
-	border-top: 1px dashed #aaa;
-	border-left: 1px dashed #aaa;
-	padding: 10px;
-	margin-bottom: 20px;
-}
-
 #footer {
 	background-color: #fff;
 	float: right;
@@ -91,7 +70,7 @@ body
 	top: 16px;
 	margin: 0 auto;
 	background-color: #007fc8;
-	height: 20px;
+	height: 2.5em;
 	width: 66%;
 }
 
@@ -179,7 +158,7 @@ body
 
 .menu
 {
-	font: 1.0em tahoma, sans-serif;
+	font: 2.0em tahoma, sans-serif;
 	letter-spacing: -1px;
 	padding-left: 106px;
 }
@@ -238,7 +217,7 @@ body
 #middle_content
 {
 	background-color: #007fc8;
-	top: 45px;
+	top: 4.5em;
 	position: absolute;
 	width: 100%;
 }
@@ -297,7 +276,7 @@ body
 #middle_content_half
 {
 	background-color: #646464;
-	top: 45px;
+	top: 5.5em;
 	position: absolute;
 	width: 100%;
 }
@@ -377,7 +356,7 @@ body
 #lower_mid
 {
 	position: absolute;
-	top: 240px;
+	top: 20.5em;
 	height: 15px;
 	width: 100%;
 	background: #b8b8b8;
@@ -707,7 +686,7 @@ body
 	height: auto;
 	position: absolute;
 	float: left;
-	top: 160px;
+	top: 13em;
 	font: 1.2em tahoma, sans-serif;
 }
 
@@ -739,4 +718,29 @@ body
     font-size: medium;
     padding-left: 5em;
     width: 60em;
+}
+
+#article_list {
+    font-size: medium;
+    padding-left: 2em;
+    width: 60em;
+}
+
+p.date {
+    font-weight: bold;
+}
+
+.ribbon {
+  background-color: #a00;
+  overflow: hidden;
+}
+.ribbon a {
+  border: 1px solid #faa;
+  color: #fff;
+  display: block;
+  font: bold 81.25% 'Helvetiva Neue', Helvetica, Arial, sans-serif;
+  margin: 0.05em 0;
+  padding: 0.5em 3.5em;
+  text-align: center;
+  text-decoration: none;
 }

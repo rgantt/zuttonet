@@ -25,13 +25,14 @@
 			<div id="top_mid"></div>
 
 			<div id="top_nav">
-				<div class="menu">
-					<ul>
-						<li><a href="/">home</a></li>
-						<li><a href="/pages/projects">projects</a></li>
-						<li><a href="/pages/contact">contact</a></li>
-					</ul>
-				</div>
+                <div class="menu">
+    <ul>
+        <li><a href="/">home</a></li>
+        <li><a href="/pages/projects">projects</a></li>
+        <li><a href="/pages/contact">contact</a></li>
+        <li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+    </ul>
+</div>
 			</div>
 		</div>
 		
@@ -46,8 +47,16 @@
 		<div id="lower_mid"></div>
 
 		<div id="lower_content">
-			User-agent: *
+            <div id="article_list">
+                User-agent: *
 Disallow: /
+            </div>
+            
+            <div style="float: left; width: 100%; background-color: #fff; border-width: 0; border-style: none; border-top: 1px solid #8E8E8E; margin-top: 15px;">
+    <div id="footer">
+        <a href="/">HOME</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/pages/projects">PROJECTS</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="/pages/contact">CONTACT</a>
+    </div>
+</div>
 		</div>
 	</body>
 </html>
