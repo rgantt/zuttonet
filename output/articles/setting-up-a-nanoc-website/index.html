@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>ZuttoNet - Setting up a nanoc website (compilation and rules)</title>
+
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name="Title" content="ZuttoNet Web Development" />
+		<meta name="Author" content="ZuttoNet" />
+		<meta name="copyright" content="2007-2011 ZuttoNet WebMedia" />
+		<meta name="Language" content="en" />
+		<meta name="robots" content="index,follow" />
+
+		<link rel="stylesheet" type="text/css" media="screen" href="/main/style.css" />
+		<link rel="shortcut icon" href="/images/favicon.ico" />
+
+		<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			_uacct = "UA-2356219-1";
+			urchinTracker();
+		</script>
+	</head>
+
+	<body>
+		<div id="wrapper">
+			<div id="top_mid"></div>
+
+			<div id="top_nav">
+                <div class="menu">
+    <ul>
+        <li><a href="/">articles</a></li>
+        <li><a href="/pages/contact">about me</a></li>
+        <li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+    </ul>
+</div>
+			</div>
+		</div>
+
+			<div id="middle_content_half">
+				<div id="middle_left_half"></div>
+				<div id="middle_right_half"></div>
+			</div>
+
+			<div id="middle_content_half_lower"></div>
+
+			<div id="middle_content_half_mid"></div>
+			<div id="content_sub">            
+                <div id="article_content">
+                    <h2>Setting up a nanoc website (compilation and rules)</h2>
+                    <h3>By Ryan on  in ruby, nanoc, static, guide</h3>
+                    
+                    <p>The first thing that tripped me up about nanoc was how best to handle my images and other binary files. I think the documentation talks about binary files a bit, but I was left a little confused even after several reads through. I knew that the standard nanoc metadata couldn&#8217;t simply be added to the top of the file, but I had trouble figuring out how to get the files where I wanted them to go. A little trial and error helped, but the biggest breakthrough came after I worked with the process as a whole. Below is an example of my compilation and routing rules for my basic images:</p>
+<p>Basically, the nanoc process consists of two steps: compilation and routing. Compilation, the way I see it, is the process of taking particular items (in the nanoc nomenclature) and transforming their contents according to specific rules that you create. To help you out, nanoc provides a bunch of built-in helpers and filters while exposing a simple api for accessing each item as it&#8217;s given. Compilation can be as complicated as translating into another language (or something) or as simple as passing the content through. The articles on this site, for example, are simply passed through RedCloth (a Ruby textile implementation) and returned.</p>
+<p>After all of the items are compiled and linked, they&#8217;re routed. Routing is the process of actually putting the compiled files where they need to go. Routing rules match item identifiers (in the same way that compilation rules do) and allow you to return a string different than the identifier, in which case the item will be placed in <code>/output/</code> accordingly. Routing <code>/foo/</code> to <code>/pages/foo/</code> for example, will cause the output file to be placed in <code>/pages/foo/index.html</code> instead of <code>/foo/index.html</code> by default. One could also route <code>/foo/</code> to <code>/foo.html</code> if one wanted. The routing rule is given the item object to work with, which includes data about the identifier, the path, the extension, and other things.</p>
+<p>Here&#8217;s an example of the compilation and routing rules I use for the index page and the articles for this website:</p>
+<script src="https://gist.github.com/1012755.js?file=compile_and_route_articles.rb"></script><p>So, back to images: images need no compilation. In fact, we need to prevent any sort of compilation from being done to them. The easiest way to do this is to set up an empty rule; a rule block that does nothing. Next, we need to route the images to their final destination. In my situation, I wanted to be able to access all of my images with a route (or absolute <span class="caps">URI</span>) that resembled <code>"/images/name.ext"</code>. Easy enough-I set up a rule that routes all files in the <code>/content/images</code> directory of my nanoc install to <code>/output/images/name.ext</code> (including any subdirectory names).</p>
+<p>Here are the compilation and routing rules I use for basic images on this website:</p>
+<script src="https://gist.github.com/1012755.js?file=compile_and_route_images.rb"></script><p>Looking at the routing rules, it might seem like nanoc is just wasting time-after all, why would I not just put the files in the output structure that I want to begin with? The real value in the routing defaults, as I see it, is that nanoc prefers to rename files to <code>index.html</code> and place them in a subdirectory that corresponds to the old filename. This is useful, because instead of having to type a url like: <code>zuttonet.com/pages/contact.html</code>, you can simply make your request for <code>zuttonet.com/pages/contact</code> instead (provided that <code>index.html</code> is set as your web server&#8217;s default file to serve when a subdirectory is accessed). Since the content-type of <code>text/html</code> is all but implicit when making a page request from a web browser, it makes little sense to require your users to type it every single time. Furthermore, when a non-browser user-agent makes the request, they can request a different content-type and be served a different file <em>even from the same request</em>. Pretty cool!</p>
+                </div>
+
+				<div id="footer-container">
+    <span>All content copyright Zutto LLC, 2007-2011.</span>
+	<span>Site generated by <a href="http://nanoc.stoneship.org/">nanoc</a>.</span>
+    <div id="footer">
+        <a href="/">HOME</a>|<a href="/pages/contact">ABOUT ME</a>|<a href="http://www.github.com/rgantt">FORK ME</a>
+    </div>
+</div>
+			</div>
+	</body>
+</html>
