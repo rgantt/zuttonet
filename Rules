@@ -51,6 +51,10 @@ route '/resume/style/' do
   '/resume/style.css'
 end
 
+route '/resume/rpg_signature/' do
+  '/resume/schedulicity_cover/rpg_signature.png'
+end
+
 route '/images/*' do
   item.identifier.chop + '.' + item[:extension]
 end
