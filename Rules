@@ -38,6 +38,10 @@ compile '/articles/*' do
   layout 'article'
 end
 
+compile '/posts/' do
+  filter :erb # filter, do not layout
+end
+
 compile '*' do
   filter :erb
   layout 'default'
@@ -61,6 +65,10 @@ end
 
 route '/robots/' do
   '/robots.txt'
+end
+
+route '/posts/' do
+  '/posts.xml'
 end
 
 route '*' do
