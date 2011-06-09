@@ -37,6 +37,7 @@ body {
 }
 
 #footer-container {
+	font-size: larger;
     float: left; 
     width: 100%; 
     background-color: #fff; 
