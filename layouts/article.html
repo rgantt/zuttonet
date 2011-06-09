@@ -5,6 +5,8 @@
                     <h3>By <%=h item[:author] %> on <%=h item[:published] %> in <%=h item[:tags] %></h3>
                     
                     <%= yield %>
+					
+					<%= render "partials/disqus" %>
                 </div>
 
 				<%= render "partials/bottom_menu" %>

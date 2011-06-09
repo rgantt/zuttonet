@@ -55,6 +55,24 @@
 <p>&#8220;Now what?&#8221; This is the question you should be asking every time you created a passing unit test. Is my next-simplest test in this case test case, or should I start a new test case to make sure that my controllers are being loaded properly? There is more marginal value in the short term for adding a test against a widely-used feature than making sure a 4-d array in the query string will map properly into your framework. If the controllers aren&#8217;t being loaded, your query string isn&#8217;t going to mean much, anyway! Your first test of controllers means more than your 20th test of <span class="caps">URL</span> rewriting in the short term. Of course, none of this is particularly contentious.</p>
 <p>What about a situation where a unit test you&#8217;ve written doesn&#8217;t pass? At this point, we need to consider whether we&#8217;re in a position to change framework code. What hat are we wearing? If we&#8217;re wearing our unit testing hat and we&#8217;re working against an existing codebase, we might favor altering the tests to get them to pass, rather than altering the framework to implement appropriate functionality. Cross this line too many times and you may end up in a situation where you&#8217;re crossing into untested territory. Fixing concepts in one area of the framework quickly leads to other parts, and we&#8217;re right back to where we were. Even though it will make the developer within you cringe, set aside the test for now&#8212;or simplify it to make it pass&#8212;and simultaneously write up the bug. You are using issue-tracking, aren&#8217;t you?!</p>
 <p>What now? Say you&#8217;ve got your basic functionality covered well. Your software works as it did&#8212;you haven&#8217;t changed anything, except for the tests themselves, so there should be no possible way to introduce a regression. When is it time to make the transition from post-hoc test coverage to test-driven development? This is a slightly less well-defined subject area. Sometimes writing tests for existing functionality will lead to ideas for new functionality within existing units. To be sufficiently vague, it&#8217;s time to start revisiting all of those QA defects you wrote up in the previous section and making the quality changes to your framework. You need to be confident enough in your test coverage to know that you aren&#8217;t adding blatant regressions to your code. You probably don&#8217;t need 100% coverage (which is a myth, anyway), but you also don&#8217;t want to rely on your build to tell you whether everything&#8217;s ok. This is less of &#8220;test-driven development&#8221; and more of &#8220;test-driven test coverage improvements.&#8221; We&#8217;re going back through our code and adding coverage that really ought to have been there in the first place. In order to add this coverage, we might need to step in and clean up a few messes.</p>
+					
+										<div id="disqus_thread"></div>
+					<script type="text/javascript">
+						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
+
+						// The following are highly recommended additional parameters. Remove the slashes in front to use.
+						var disqus_identifier = '/articles/late-game-unit-testing/';
+						var disqus_url = 'http://www.zuttonet.com/articles/late-game-unit-testing/';
+
+						/* * * DON'T EDIT BELOW THIS LINE * * */
+						(function() {
+							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+						})();
+					</script>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus</a>.</noscript>
+					<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
                 </div>
 
 				<div id="footer-container">

@@ -55,6 +55,24 @@
 <script src="https://gist.github.com/1012755.js?file=compile_and_route_articles.rb"></script><p>So, back to images: images need no compilation. In fact, we need to prevent any sort of compilation from being done to them. The easiest way to do this is to set up an empty rule; a rule block that does nothing. Next, we need to route the images to their final destination. In my situation, I wanted to be able to access all of my images with a route (or absolute <span class="caps">URI</span>) that resembled <code>"/images/name.ext"</code>. Easy enough-I set up a rule that routes all files in the <code>/content/images</code> directory of my nanoc install to <code>/output/images/name.ext</code> (including any subdirectory names).</p>
 <p>Here are the compilation and routing rules I use for basic images on this website:</p>
 <script src="https://gist.github.com/1012755.js?file=compile_and_route_images.rb"></script><p>Looking at the routing rules, it might seem like nanoc is just wasting time-after all, why would I not just put the files in the output structure that I want to begin with? The real value in the routing defaults, as I see it, is that nanoc prefers to rename files to <code>index.html</code> and place them in a subdirectory that corresponds to the old filename. This is useful, because instead of having to type a url like: <code>zuttonet.com/pages/contact.html</code>, you can simply make your request for <code>zuttonet.com/pages/contact</code> instead (provided that <code>index.html</code> is set as your web server&#8217;s default file to serve when a subdirectory is accessed). Since the content-type of <code>text/html</code> is all but implicit when making a page request from a web browser, it makes little sense to require your users to type it every single time. Furthermore, when a non-browser user-agent makes the request, they can request a different content-type and be served a different file <em>even from the same request</em>. Pretty cool!</p>
+					
+										<div id="disqus_thread"></div>
+					<script type="text/javascript">
+						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
+
+						// The following are highly recommended additional parameters. Remove the slashes in front to use.
+						var disqus_identifier = '/articles/setting-up-a-nanoc-website/';
+						var disqus_url = 'http://www.zuttonet.com/articles/setting-up-a-nanoc-website/';
+
+						/* * * DON'T EDIT BELOW THIS LINE * * */
+						(function() {
+							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+						})();
+					</script>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus</a>.</noscript>
+					<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
                 </div>
 
 				<div id="footer-container">

@@ -59,6 +59,24 @@
 <p>The <a href="http://www.php.net/call_user_func_array">call_user_func_array</a> function accepts two parameters: a callback function (in the case of a function, this is simply a string; in the case of a method, this requires an array containing the instance of the class and the name of the method) and an array of parameters to pass to that function. This means that we can call any method at runtime, provided that we have its name or an instance of its containing class. In conjunction with the <code>__call</code> magic method available to classes in PHP5, we can intercept method calls to an object and redirect them anywhere we please. That means that, although <code>sextile</code> and <code>Textile</code> have different class signatures, they can serve the same purpose in any situation. This helps us with decorators because it allows us to pass non-decorated method calls through to the concrete instance of the decorated class. In a situation where one is interested in decorating <em>all</em> methods of a class with a common functionality change, this would be a huge benefit. For example, adding logging at runtime.</p>
 <p>One thing to remember about using <code>__call</code> in combination with <code>call_user_func_array</code> would be that type hints and calls to the <code>instanceof</code> operator will fail when comparing instances of class <code>Textile</code> to instances of class <code>sextile</code>. This is an unintended negative consequence of forgoing a common ancestor.</p>
 <p>Note that by forgoing a common parent for the decorator classes, we are forced to add this <code>__call</code> method to every single decorator. This would constitute a pretty clear violation of the <a href="http://c2.com/cgi/wiki?DontRepeatYourself"><span class="caps">DRY</span></a> principle, because the same code would exist in multiple classes. I would argue for using your marginal instinct in this case; if you have a handful of decorators, the benefits of duplication might outweigh the costs of maintaining another class. In the case of many possible decorators, the <a href="http://c2.com/xp/CodeSmell.html">smelly code</a> might merit a refactoring to a higher place in the hierarchy. Personally I think my balance point would be around 2-3 decorators.</p>
+					
+										<div id="disqus_thread"></div>
+					<script type="text/javascript">
+						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
+
+						// The following are highly recommended additional parameters. Remove the slashes in front to use.
+						var disqus_identifier = '/articles/decorating-php-classes-without-common-ancestor/';
+						var disqus_url = 'http://www.zuttonet.com/articles/decorating-php-classes-without-common-ancestor/';
+
+						/* * * DON'T EDIT BELOW THIS LINE * * */
+						(function() {
+							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+						})();
+					</script>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus</a>.</noscript>
+					<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
                 </div>
 
 				<div id="footer-container">
