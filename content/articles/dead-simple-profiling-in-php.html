@@ -1,0 +1,20 @@
+---
+kind: article
+title: Dead simple performance profiling in PHP 5.3
+tags: [ 'php', 'performance', 'testing', 'profiling' ]
+created_at: Time.parse( "June 13, 2011" )
+author_name: Ryan
+excerpt: I often find myself wondering which way to do things is best. Of course, PHP's library makes it pretty easy to whip up a quick set of timing functions to wrap around your code. It's disconcerting to me, however, to make two function calls and call it good. Maybe I'm jaded by the prevalence of blocks in ruby, but I would love to see that my profiling code is getting everything I want and _only_ those things I want. So I decided to (finally?) sit down and whip up something quick and simple to alleviate my neurosis.
+---
+
+As of PHP 5.3, we have access to anonymous functions (closures) in our code. This makes it pretty easy to wrap scope and functionality into a nice, neat little package and feed it to a utility function to do with it what it will (instead of responding only at runtime). So I wrote a function, called @profile@, which accepts a diagnostic messge and a closure which should include the code you are interested in profiling.
+
+<script src="https://gist.github.com/1025970.js?file=profile.php"></script>
+
+All this function does is record the current time in microseconds, run the callback you passed, check the time again, and then return a string representation of the execution time. Simple enough, right!? I had a hard time finding something suitably simple, though. Here's an example of it in action:
+
+<script src="https://gist.github.com/1025970.js?file=simple_test.php"></script>
+
+The world of performance profiling is now your oyster. Of course, this approach is limited by the implementation details of closures. For example, if you want to globalize variables from a broader scope to use in your closure, you'll have to import them using the @use@ keyword in the closure definition.
+
+This could also be broadened a bit by wrapping the profile function up into a profiling class that would save information about various closure executions. Furthermore, I make a pretty bold assumption about how I wanted the information about the execution time returned back to me; this could certainly use some abstraction. Sounds like a good evening project!
