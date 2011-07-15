@@ -4,71 +4,96 @@ title: Anonymous functions and closure in PHP
 tags: [ 'php', 'closure', 'anonymous functions' ]
 created_at: Time.parse( "July 15, 2011" )
 author_name: Ryan
-excerpt: PHP 5.3 introduces function literals to the language, which gives us some big benefits when using functions that accept other functions as arguments (typically as a callback). However, anonymous functions were paired with another useful language construct which allows us to close over variables in the same lexical scope as the anonymous function, creating a closure.
+excerpt: PHP 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of anonymous functions was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure.
 ---
-                                 
+
+PHP 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of "anonymous functions":http://php.net/manual/en/functions.anonymous.php was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure.
+
+h2. What is closure?
+
 According to Wikipedia, a *closure* is a
 
 bq. function together with a referencing environment for the nonlocal names (free variables) of that function
 
-Such a function is said to be _closed over_ its free variables. These free variables, or _upvalues_, come from the enclosing scope of the anonymous function and persist even when the stack frame that introduced them is destroyed.
+A closure is so-called because it is _closed over_ its free variables. These free variables, or _upvalues_, come from the enclosing scope of the anonymous function and persist even after that scope, and all references to it, is otherwise made unavailable (e.g., by the function execution completing and returning control back to the previous frame).
 
-What does this mean for us, as PHP developers? If you're using function literals to assign anonymous functions to named variables, then not much. You can already do this, to some extent, by using the much-maligned @global@ keyword to import variable references from the global scope. In any _other_ context, however, closures are a powerfully expressive means for performing many otherwise tedious and complicated tasks.
+What does this mean for you, as a PHP developer? If you're only using vanilla functions to read in and act upon or modify global variables, then probably not much. You can already do something functionally _similar_ (emphasis) to this using the much-maligned "@global@ keyword":http://us.php.net/manual/en/language.variables.scope.php#language.variables.scope.global to import variable references from the global scope. However, when working somewhere other than the global scope--or when using anonymous functions--closures are a powerfully expressive means for performing many otherwise tedious and complicated tasks.
 
-First, let's walk through an example of using the @global@ keyword in a function defined in the global namespace (or a method defined in a class in the global namespace) as a basis for comparison against the closures we'll talk about momentarily.
+h2. What isn't closure?
 
-Suppose you are writing a function that, for some _good_ reason, requires you to change a variable defined outside of the function's scope. We can import the global variable into the function scope using the @global@ keyword, like so:
+First, let's walk through an example of using the @global@ keyword in a function defined in the global namespace as a basis for comparison against the closures we'll talk about momentarily.
+
+h3. The @global@ keyword
+
+Suppose you are writing a function that, for some _good_ reason, requires you to change a variable defined outside of the function's scope. We can import the variable from the global scope into the function scope using the @global@ keyword, like so:
 
 <script src="https://gist.github.com/1084089.js?file=basic-global.php"></script>
 
-The output of this script would be @1@. The function body imports the reference to the global variable @$count@, whose value at that time is @0@. The global variable itself is then incremented. So, this function actually modifies something in the global namespace. 
+The output of this script would be @1@. The @global@ keyword imports a reference to the global variable @$count@, whose value at that time is @0@, into the function scope. The global variable itself is then incremented. Because we have imported and incremented a reference, this function actually modifies something in the global namespace. 
 
-A naive reading of the definition of _closure_ above might lead one to think that this fits the definition. Upon further inspection, the implementation details are slightly different; PHP has a superglobal variable named @$GLOBALS@ that is accessible from within any scope. The construct @global $var@ is simply syntactic sugar for the uglier expression @$var = &$GLOBALS['var'];@, which would have the same effect. This is not closure.
+A naive reading of the definition of _closure_ above might lead one to think that this fits the bill. However, the implementation details are slightly different; PHP has a "superglobal":http://us.php.net/manual/en/language.variables.superglobals.php variable named @$GLOBALS@ that is accessible from within any scope. The @global $var@ construct is simply syntactic sugar for the much uglier @$var = &$GLOBALS['var'];@ expression, which would have the same effect. Because this is simply a reference to a superglobal, we could in principle observe manipulation of this variable from another source, outside of the function. This is not closure.
 
-Another reason this does not create closure is due to the fact that, no matter what scope you are currently within, @global@ imports only from the global namespace (due to the implementation reality outlined above). For example, a function within a function cannot import scope from its parent, but only from the global namespace.
+h3. Scope within a scope
+
+Another reason this does not create closure is due to the fact that, no matter within which scope you currently operate, @global@ imports only references from the _global_ namespace (due to the implementation reality outlined above). For example, a function within a function cannot import scope from its parent using @global@, but only from the global namespace.
 
 <script src="https://gist.github.com/1084089.js?file=global-inner-function.php"></script>
 
-Running the program above will output @11@. This shows that global imports variables only from the global namespace, not just from the "parent" namespace. Closure would require either the @global@ statement to work as just described, or simply allow the parent scope to creep into the child scope (another style of scoping entirely, a la javascript). This is not closure.
+Running the program above will output @1 1@ (no spaces). This shows that @global@ imports variables only from the global namespace, not just from the "parent" namespace. Closure would require either the @global@ statement to grab from the next-highest namespace, or simply allow the parent scope to creep into the child scope (another style of scoping entirely, a la javascript). This is not closure.
 
-Is an anonymous function a closure, then? Anonymous functions and closures are often conflated, but they are distinct concepts. I think the garden path I've been leading you on so far should have steered you away from this, but let's just make sure. We know that simply using @global@ isn't closure because of its implementation-that it doesn't actually close over variables within the function-defining scope, it just brings them into the current scope by reference.
+h3. Anonymous functions
 
-I'm not exactly sure about the low-level implementation details of functions versus anonymous functions in PHP 5.3, but as far as I know there is no meaningful difference in terms of the ostensible constraints they face in terms of scope, input, and output. For example:
+Is an anonymous function a closure, then? Anonymous functions and closures are often conflated, but they are distinct concepts. I think the garden path I've been leading you on so far should have steered you away from this, but let's just make sure. We know that simply using @global@ isn't closure because of its implementation-that it doesn't actually close over variables within the function-defining scope, it just brings them into the current scope by reference. Anonymous functions are still functions, and @global@ operates within them the same way it operates within named functions. Anonymous functions are not closures.
+
+I'm unclear on the low-level implementation details of functions versus anonymous functions in PHP 5.3, but there is no practical difference in terms of the ostensible constraints they face in terms of scope, input, and output. For example:
 
 <script src="https://gist.github.com/1084089.js?file=function-literal-global.php"></script>
 
-The only meaningful difference here is that @increase_count@ is given a name at define-time, while @$increase_count_again@ is assigned a function literal which is executed by name at run time. They both face the same rules _vis-a-vis_ @global@, and the fact that this script will output @2@ is proof of that.
+The only meaningful difference here is that @increase_count@ is given a name at define-time, while @$increase_count_again@ is assigned a function literal which is executed by variable name at run time. They both face the same rules _vis-a-vis_ @global@, and the fact that this script outputs @2@ is proof of that.
 
-So what is closure? You've been reading long enough now that you might suspect I've eliminated every possible misconception that could possible arise. That's not true; closure is a difficult concept to grasp, and misunderstanding it can lead to misuse, which can introduce hard-to-detect bugs.
+h2. The @use@ keyword
 
-Closure requires both a function, which creates its own scope, and a surrounding environment which persists through an arbitrary number of executions of that function. So, an anonymous function is insufficient; it satisfies only the first part of this requirement. In order to produce a closure, we need to be able to create the surrounding environment. Luckily, PHP 5.3 also introduced a very useful construct for turning anonymous functions into closures.
+So what is closure? You've been reading long enough now that you might suspect I've eliminated every possible misconception and misunderstanding that could possible arise. That's not true; closure is a difficult concept to grasp, and misunderstanding it can lead to misuse, which can introduce hard-to-detect bugs.
 
-The @use@ keyword, when paired with a function literal, or anonymous function, allows us to import variable values or references into the scope of the function. Here's an example:
+Closure requires both a function, with its own scope, and a surrounding environment which persists through an arbitrary number of executions of that function. So, an anonymous function is insufficient. In order to produce a closure, we need to be able to create the surrounding environment. Luckily, PHP 5.3 also introduced a very useful construct for turning anonymous functions into closures.
+
+h3. @use@ by value
+
+The @use@ keyword, when paired with a function literal--or anonymous function--allows us to import variable values or references into the scope of the function. Here's an example:
 
 <script src="https://gist.github.com/1084089.js?file=simple-naive-closure-value.php"></script>
 
-We are importing @$count@ by value, so the output of the script is @1@. This is because we are taking the value of @$count@ at the time the function literal is defined and initializing a new variable in our function to refer to that value. Even if we change the value of @$count@ (say, by incrementing it between defining @$decrease_count@ and calling it), it is now bound to @1@ within the function body. This also implies that changing @$count@ in the function body will have no effect on its enclosing scope. This is not closure.
+We use @$count@ by value, so the output of the script is @1@. This is because PHP binds a function-local variable named @$count@ to the value of the parent-local @$count@ at the time the function literal is defined. Even if we change the value of the parent-local @$count@ (say, by incrementing it between defining @$decrease_count@ and calling it), its value within the function body will not change. This also implies that changing @$count@ in the function-local scope will have no effect on the value of @$count@ in the parent-local scope. This is not closure.
 
-More basically, how is this any different from using @global@ inside a function defined in the global namespace? The most important way is that it allows us to import a value or reference from the immediate-parent scope, not just the global scope. The tuple following the @use@ keyword tells PHP to import values or references to each element into the function scope.
+h3. @use@ by reference
+
 
 <script src="https://gist.github.com/1084089.js?file=simple-naive-closure-reference.php"></script>
 
-I keep using the term "values or reference" because either is possible. Notice in the example above that I have prefixed @$count@ with @&@, the PHP symbol that reds "by reference." The output of the above script is as expected; @$count@ is decremented and the result is @0@. Notice that this particular script need not be defined in the global namespace (the file in which it's defined could be included in a function, for example); @use@ always refers to the scope in which the function is defined. This is closure.
+I keep using the phrase "by value or reference" because either is possible. Notice in the example above that I have prefixed @$count@ with @&@, the PHP symbol that makes an assignment "by reference":http://php.net/manual/en/language.references.pass.php. The output of the above script is as expected: @$count@ from the parent-local scope is decremented in the function-local scope and the printed result is @0@. Notice especially that this particular script need not be defined in the global namespace (the file in which it's defined could be included in a function, for example); @use@ always refers to the scope in which the function is defined. This is closure.
 
-Ok, so we can import variables by reference into our anonymous functions. What's the big deal? Well, now that we understand many of the things that _aren't_ closure (and have an example of something that technically _is_ closure), let's see what we can do with it.
+More basically, you might ask: how is this any different from using @global@ inside a function defined in the global namespace? The most important way is that it allows us to import a value or reference from the immediate-parent scope, not just the global scope. The tuple following the @use@ keyword tells PHP to import values or references to each element into the function scope.
 
-Strictly speaking, the information that is created inside of a function body is lost when that function's execution is completed, because the frame containing it is popped off the stack (although this "isn't exactly right":http://stackoverflow.com/questions/6441218/can-a-local-variables-memory-be-accessed-outside-its-scope). Within a closure, however, we can maintain and manipulate the information created inside of an enclosing function. Check out the following example:
+Ok, so you can import variables by reference into anonymous functions. What's the big deal? Well, now that you understand many of the things that _aren't_ closure (and have an example of something that technically _is_ closure), let's see what you can do with it.
+
+h2. Usage of closure
+
+Under usual circumstances and in many languages, any variable allocated within a function body is lost when that function's execution is completed, because the frame containing it is popped (although this "isn't exactly right in all languages":http://stackoverflow.com/questions/6441218/can-a-local-variables-memory-be-accessed-outside-its-scope). Within a closure, however, we can maintain and manipulate the information created inside of an enclosing function even after that enclosing function has finished execution. Check out the following example:
 
 <script src="https://gist.github.com/1084089.js?file=full-closure-count.php"></script>
 
-In this script, the body of the @create_closure@ function has a local variable named @$count@. @create_closure@ returns an anonymous function which has by-reference access to this local variable. Therefore, where @create_closure@'s @$count@ would typically lose all references when its body was finished executing, now there remains a reference to it in any variable to which the anonymous function is assigned. *@create_closure@ creates a closure because it returns a function together with a referencing environment for the nonlocal names of that function*. This is closure.
+In this script, the body of the @create_closure@ function has a local variable named @$count@. @create_closure@ returns an anonymous function which has by-reference access to this local variable. Therefore, where references to @create_closure@'s @$count@ would typically lose all meaning when its body was finished executing, there now remains a reference to it _within_ any variable to which the anonymous function is assigned. *@create_closure@ creates a closure because it returns a function together with a referencing environment for the nonlocal names of that function*. This is closure.
 
-Notice the output of the above. We call the anonymous function three times, and the output changes each time, even though the body of the anonymous function really does nothing interesting. @$closure@ has "closed over" @$count@ and now has local access to it for any call to @$closure()@.
+Notice the output of the above (shown inline as comments). We call the anonymous function three times, and the output changes each time, even though the body of the anonymous function really does nothing interesting. @$closure@ has "closed over" @$count@ and now has local access to it for any call to @$closure()@.
+
+h2. More advanced usage
 
 What if we generate multiple closures; how is this handled? I'm so glad you asked.
 
 <script src="https://gist.github.com/1084089.js?file=full-closure-count-2.php"></script>
 
-We are now creating two versions of the closure. You noticed, of course, that the function generating the closures is parameterized by @$count@. Since we are calling this function twice--with a different parameter value each time--it shouldn't come as a surprise that we will be receiving two separate closures, each closed over a different value for @$count@.
+We now create two different closures. You noticed, of course, that the function generating the closures is parameterized by @$count@. Since we call this function twice--each time with a different parameter value--it shouldn't come as a surprise that we will receive two separate closures, each closed over a different value for @$count@.
+
+h2. Conclusion
 
 Anonymous functions and closures are a very neat and powerful addition to PHP 5.3. I hope after reading this article you better understand how to use these new language features, and maybe even have a better idea of why they're a big improvement over what was previously available. This article is meant to serve as a basic introduction and overview of the language-level characteristics of closures. Let me know what you think!
