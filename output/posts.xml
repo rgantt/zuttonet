@@ -10,11 +10,11 @@
     <uri>http://www.zuttonet.com</uri>
   </author>
   <entry>
-    <id>tag:www.zuttonet.com,2011-07-15:/articles/anoymous-functions-and-closure-php/</id>
+    <id>tag:www.zuttonet.com,2011-07-15:/articles/anonymous-functions-and-closure-php/</id>
     <title type="html">Anonymous functions and closure in PHP</title>
     <published>2011-07-15T06:00:00Z</published>
     <updated>2011-07-15T06:00:00Z</updated>
-    <link rel="alternate" href="http://www.zuttonet.com/articles/anoymous-functions-and-closure-php/"/>
+    <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-functions-and-closure-php/"/>
     <content type="html">&lt;p&gt;According to Wikipedia, a &lt;strong&gt;closure&lt;/strong&gt; is a&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;function together with a referencing environment for the nonlocal names (free variables) of that function&lt;/p&gt;
