@@ -60,7 +60,10 @@
 <p>One thing to remember about using <code>__call</code> in combination with <code>call_user_func_array</code> would be that type hints and calls to the <code>instanceof</code> operator will fail when comparing instances of class <code>Textile</code> to instances of class <code>sextile</code>. This is an unintended negative consequence of forgoing a common ancestor.</p>
 <p>Note that by forgoing a common parent for the decorator classes, we are forced to add this <code>__call</code> method to every single decorator. This would constitute a pretty clear violation of the <a href="http://c2.com/cgi/wiki?DontRepeatYourself"><span class="caps">DRY</span></a> principle, because the same code would exist in multiple classes. I would argue for using your marginal instinct in this case; if you have a handful of decorators, the benefits of duplication might outweigh the costs of maintaining another class. In the case of many possible decorators, the <a href="http://c2.com/xp/CodeSmell.html">smelly code</a> might merit a refactoring to a higher place in the hierarchy. Personally I think my balance point would be around 2-3 decorators.</p>
 					
-										<div id="disqus_thread"></div>
+			Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
+			<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+			<hr />
+								<div id="disqus_thread"></div>
 					<script type="text/javascript">
 						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
 
