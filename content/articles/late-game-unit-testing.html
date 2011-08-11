@@ -1,10 +1,10 @@
 ---
 kind: article
 title: Late-game unit testing
-tags: [ 'testing', 'units' ]
+tags: [ 'testing', 'test-driven development', 'unit tests', 'old code' ]
 created_at: Time.parse( "April 7, 2011" )
 author_name: Ryan
-excerpt: Sometimes I revisit old projects for which I didn't write unit tests. Oops. Sometimes I neglect to write unit tests during development in new projects. Oops. In situations like these, what are some approaches to then going back and adding "necessary" test coverage? 
+excerpt: Sometimes I need to add features to old projects for which I didn't write unit tests. Sometimes I neglect to write unit tests during development in new projects. Oops. In situations like these, what are some approaches to then going back and adding "necessary" test coverage? 
 ---
 
 I've struggled with this issue recently as I go back and add tests to "sake":http://www.github.com/rgantt/sake, my pet MVC framework. The framework's deployed on enough sites--albeit smallish ones--to confirm that the core functionality is working as intended. When I encounter a framework defect during deployment of a sake site, I revisit the repository and update where necessary. I do "thorough" functional tests to ensure that I haven't introduced any obvious regressions and then continue to hack happily away on the site. 
