@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>ZuttoNet - Dead simple performance profiling in PHP 5.3</title>
+		<title>ZuttoNet - Simple performance profiling in PHP 5.3</title>
 
 		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
 		<meta name="Title" content="ZuttoNet Web Development" />
@@ -45,13 +45,15 @@
 			<div id="middle_content_half_mid"></div>
 			<div id="content_sub">            
                 <div id="article_content">
-                    <h1>Dead simple performance profiling in PHP 5.3</h1>
-                    <h3>By Ryan on  in <a href="http://technorati.com/tag/php" rel="tag">php</a>, <a href="http://technorati.com/tag/performance" rel="tag">performance</a>, <a href="http://technorati.com/tag/testing" rel="tag">testing</a>, <a href="http://technorati.com/tag/profiling" rel="tag">profiling</a></h3>
+                    <h1>Simple performance profiling in PHP 5.3</h1>
+                    <h3>By Ryan on  in <a href="http://technorati.com/tag/php" rel="tag">php</a>, <a href="http://technorati.com/tag/performance" rel="tag">performance</a>, <a href="http://technorati.com/tag/testing" rel="tag">testing</a>, <a href="http://technorati.com/tag/profiling" rel="tag">profiling</a>, <a href="http://technorati.com/tag/timing" rel="tag">timing</a></h3>
                     
-                    <p>As of <span class="caps">PHP</span> 5.3, we have access to function literals&#8212;anonymous functions&#8212;in our code. This makes it pretty easy to wrap scope and functionality into a nice, neat little package and feed it to a utility function to do with it what it will (instead of responding only at runtime). So I wrote a function, called <code>profile</code>, which accepts a diagnostic messge and a callback which wrap around the code you are interested in profiling.</p>
-<script src="https://gist.github.com/1025970.js?file=profile.php"></script><p>All this function does is record the current time in microseconds, run the callback you passed, check the time again, and then return a string representation of the execution time. Simple enough, right!? I had a hard time finding something suitably simple, though. Here&#8217;s an example of it in action:</p>
-<script src="https://gist.github.com/1025970.js?file=simple_test.php"></script><p>The world of performance profiling is now your oyster. Of course, this approach is limited by the implementation details of anonymous functions. For example: if you want to globalize variables from a broader scope to use in your callback, you&#8217;ll have to import them using the <code>use</code> keyword in the definition, creating a closure.</p>
-<p>This could also be broadened a bit by wrapping the profile function up into a profiling class that would save information about various closure executions. Furthermore, I make a pretty bold assumption about how I wanted the information about the execution time returned back to me; this could certainly use some abstraction. Sounds like a good evening project!</p>
+                    <p>I love finding new ways to use PHP&#8217;s anonymous functions. One thing that caught my attention recently is how they make it so easy to wrap scope and functionality into little packages. These packages can easily be fed to a utility function, allowing the functionality contained therein to be wrapped and modified dynamically.</p>
+<p>How nice would it be if there were a simple way to wrap up some script execution and figure out how long it takes? Or to take multiple versions of a function&#8212;or class, or whatever&#8212;and figure out which one runs in less time? It would be super nice. Unfortunately, I have never really run across a very <em>simple</em> way to do that. So I wrote a function, called <code>profile</code>, which accepts a diagnostic messge and a lambda which wrap around the code you are interested in profiling.</p>
+<p>The lambda that <code>profile</code> takes should just be an anonymous function that contains all of the code that you&#8217;re interested in profiling. It could also be a named function, or even an object that implements <code>__invoke</code> (a functor). Just make sure that the thing you&#8217;re passing as a callback contains the code you want to time.</p>
+<script src="https://gist.github.com/1025970.js?file=profile.php"></script><p>All this function does is record the current time in microseconds, execute the function you passed, check the time again, and then return a string representation of the execution time. Simple enough, right!? I had a hard time finding something anywhere else that was so simple, though. Here&#8217;s an example of it in action:</p>
+<script src="https://gist.github.com/1025970.js?file=simple_test.php"></script><p>The world of performance profiling and optimization is now your oyster. Of course, this approach is limited by the implementation details of anonymous functions. For example: if you want to globalize variables from a broader scope to use in your callback, you&#8217;ll have to import them using the <code>use</code> keyword in the definition, creating a closure.</p>
+<p>The simple <code>profile</code> function could be broadened a bit by wrapping the profile function up into a profiling class that would save information about various executions&#8212;maybe even duplicating them and providing statistical information about those runs. The function also makes pretty bold assumptions about how information about the execution time should be packaged; this could certainly use some abstraction. Sounds like a good evening project!</p>
 					
 			Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
 			<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
