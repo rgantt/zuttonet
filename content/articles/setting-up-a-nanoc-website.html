@@ -52,3 +52,5 @@ Here are the compilation and routing rules I use for basic images on this websit
 Looking at the routing rules, it might seem like nanoc is just wasting time-after all, why would I not just put the files in the output structure that I want to begin with? The real value in the routing defaults, as I see it, is that nanoc prefers to rename files to @index.html@ and place them in a subdirectory that corresponds to the old filename. This is useful, because instead of having to type a url like: @zuttonet.com/pages/contact.html@, you can simply make your request for @zuttonet.com/pages/contact@ instead (provided that @index.html@ is set as your web server's default file to serve when a directory is requested). Pretty cool!
 
 h3. Conclusion
+
+nanoc is great for setting up a small-to-medium sized website that really doesn't need to serve dynamic content. Blogs come straight to mind. Adding comments and trackbacks to a static nanoc website is as easy as setting up a disqus account and plopping some async code in your template. Have fun!
