@@ -22,3 +22,5 @@ All this function does is record the current time in microseconds, execute the f
 The world of performance profiling and optimization is now your oyster. Of course, this approach is limited by the implementation details of anonymous functions. For example: if you want to globalize variables from a broader scope to use in your callback, you'll have to import them using the @use@ keyword in the definition, creating a closure.
 
 The simple @profile@ function could be broadened a bit by wrapping the profile function up into a profiling class that would save information about various executions--maybe even duplicating them and providing statistical information about those runs. The function also makes pretty bold assumptions about how information about the execution time should be packaged; this could certainly use some abstraction. Sounds like a good evening project!
+
+Edit: If you're interested in this concept at all, might find some use out of a more fully-implemented version--or would like to contribute--I've made a github project that does everything in this article in a bit more deptch. "Check it out!":http://www.github.com/rgantt/rolex
