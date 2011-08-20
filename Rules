@@ -43,7 +43,7 @@ compile '/posts/' do
 end
 
 compile '*' do
-  filter :erb
+  filter :redcloth
   layout 'default'
 end
 

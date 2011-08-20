@@ -13,15 +13,15 @@ You're neck deep in 3-year old production code, amazon one-click checkout isn't 
 
 <script src="https://gist.github.com/1134355.js?file=super-naive-approach.php"></script>
 
-"Well, crap," you say, seeing the @Fatal error@ reported by PHP. Turns out that variables called as functions must be an instance of @Closure@, an instance of a class which implements @__invoke()@, or a string representing a named function in the global namespace. In the case above, @$fibonacci@ is none of these. It is a free variable in the closure created by the anonymous function. When it is called, it has not been bound--hence the @Notice@ that you would have gotten if error reporting were set at a high enough threshold--and therefore can't be called as _anything_, let alone as a function.
+"Well, crap," you say, seeing the @Fatal error@ reported by PHP. Turns out that variables called as functions must be an instance of @Closure@, an instance of a class which implements @__invoke()@, or a string representing a named function in the global namespace. In the anonymous function body above, @$fibonacci@ is none of these. It is an undeclared, free variable in the closure created by the anonymous function. At the time when it's called, it hasn't been bound--hence the @Notice@ that you would have gotten if error reporting were set at a high enough threshold--and therefore can't be called as _anything_, let alone as a function.
 
-How to proceed? The classical solution would be simply to name this function; instead of binding the function to a variable called @$fibonacci@, we should just _name_ the function @fibonacci@. That would certainly be convenient. But what if we encounter a higher-order function that expects a function as a parameter? It happens that many higher-order functions in PHP can simply accept as callbacks the names of functions, but I prefer not to rely on that. In fact, any userland function you write which expects a lambda will work just as happily being sent a string. But what if we *must* provide the higher-order function with the means of calculating the nth Fibonacci number? How could we even go about implementing the recursion required to pull it off? I'm so glad you asked. 
+So how should you proceed? The classical solution would be simply to name this function; instead of binding the function to a variable called @$fibonacci@, we should just _name_ the function @fibonacci@. That would certainly be convenient. But what if we encounter a higher-order function that expects a function as a parameter? It happens that many higher-order functions in PHP can simply accept as callbacks the names of functions, but I prefer not to rely on that. In fact, any userland function you write which expects a lambda will work just as happily being sent a string. But what if we *must* provide the higher-order function with the means of calculating the nth Fibonacci number? How could we even go about implementing the recursion required to pull it off? I'm so glad you asked. 
 
 h2. Naming the nameless
 
 The difficult part about the above is that we have no good way to actually call the function in whose body we are executing while we're still in it. The thing's anonymous, after all--we are essentially looking for some way to break its anonymity, to call the nameless by name. Well, we may not be able to actually extract the name of this function for the purpose of calling it again, but we do have some information about the location where it's held in memory. This location is known to @$fibonacci@, the value we're using in the parent scope to hold the function itself. Therefore, if we could grab the value of @$fibonacci@, we could actually use it to recurse. The problem here is that @$fibonacci@ does not exist in the scope where we need to use it.
 
-If you had read my "article about closures":anonymous-functions-and-closure-php, you would know that we have the ability in PHP to do something that sounds very much like this. With PHP's @use@ keyword for anonymous function definition, we can pull either a value or a reference into a function's scope. Let's be naive and pull in the _value_ of @$fibonacci@ in a forshadowingly misguided attempt to recurse:
+If you had read my "article about closures":http://zuttonet.com/articles/anonymous-functions-and-closure-php/, you would know that we have the ability in PHP to do something that sounds very much like this. With PHP's @use@ keyword for anonymous function definition, we can pull either a value or a reference into a function's scope. Let's be naive and pull in the _value_ of @$fibonacci@ in a forshadowingly misguided attempt to recurse:
 
 <script src="https://gist.github.com/1134355.js?file=naive-closure-approach.php"></script>
 
@@ -45,13 +45,13 @@ h3. @map@:
 
 Functional programming in PHP is a whole 'nother level of ugly. Here's an implementation of @map@, a higher-order function which takes a single-argument function and applies it to each element in a collection. Here, we pass it @$fibonacci@, which holds our recursive anonymous function.
 
-<script src="https://gist.github.com/1134355.js?file=map.php"></script>
+<script src="https://gist.github.com/1134355.js?file=php-library-map.php"></script>
 
 h3. @reduce@:
 
 @reduce@ is another common higher-order function. It takes a function of two arguments and a collection and maps the array pairwise into a single value using the function.
 
-<script src="https://gist.github.com/1134355.js?file=reduce.php"></script>
+<script src="https://gist.github.com/1134355.js?file=php-library-reduce.php"></script>
 
 h2. Conclusion
 

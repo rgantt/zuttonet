@@ -2,10 +2,10 @@
 title: Recent articles
 ---
 
-<% sorted_articles.last(5).each do |article| %> 
+<% sorted_articles.each do |article| %> 
     <div class="article"> 
         <h1 class="title"><%= link_to article[:title], article.identifier.chop %></h1> 
-        <p class="date">By <%= article[:author_name] %> on <%= Kernel.eval(article[:created_at]).strftime("%A %d %B %Y") %> (<%= link_to "Comments and Reactions", article.identifier.chop + '#disqus_thread' %>)</p>
-        <p class="excerpt"><%= article[:excerpt] %> [<%= link_to "more", article.identifier.chop %>]</p>
+        <p class="date">By <%= article[:author_name] %> on <%= Kernel.eval(article[:created_at]).strftime("%d %B %Y") %></p>
+        <p class="excerpt"><%= article[:excerpt] %> [<%= link_to "read more", article.identifier.chop %>]</p>
     </div> 
 <% end %> 
