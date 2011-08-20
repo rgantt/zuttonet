@@ -14,6 +14,10 @@
     <title type="html">Anonymous recursion in PHP</title>
     <published>2011-08-08T06:00:00Z</published>
     <updated>2011-08-08T06:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-recursion-php/"/>
     <content type="html">&lt;h2&gt;The scenario&lt;/h2&gt;
 &lt;p&gt;You&amp;#8217;re neck deep in 3-year old production code, amazon one-click checkout isn&amp;#8217;t working, and your wife just left you for someone who &amp;#8220;doesn&amp;#8217;t spend so much time writing unit tests.&amp;#8221; You need to save the world by implementing an algorithm using an anonymous function &lt;em&gt;now&lt;/em&gt;. Wait, what if the problem you need to solve is well served with a recursive approach? Maybe you attack the problem optimistically, starting with something like this:&lt;/p&gt;
@@ -43,6 +47,10 @@
     <title type="html">Anonymous functions and closure in PHP</title>
     <published>2011-07-15T06:00:00Z</published>
     <updated>2011-07-15T06:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-functions-and-closure-php/"/>
     <content type="html">&lt;p&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of &lt;a href="http://php.net/manual/en/functions.anonymous.php"&gt;anonymous functions&lt;/a&gt; was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure.&lt;/p&gt;
 &lt;h2&gt;What is closure?&lt;/h2&gt;
@@ -91,6 +99,10 @@
     <title type="html">Simple performance profiling in PHP 5.3</title>
     <published>2011-06-13T06:00:00Z</published>
     <updated>2011-06-13T06:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/dead-simple-profiling-in-php/"/>
     <content type="html">&lt;p&gt;I love finding new ways to use PHP&amp;#8217;s anonymous functions. One thing that caught my attention recently is how they make it so easy to wrap scope and functionality into little packages. These packages can easily be fed to a utility function, allowing the functionality contained therein to be wrapped and modified dynamically.&lt;/p&gt;
 &lt;p&gt;How nice would it be if there were a simple way to wrap up some script execution and figure out how long it takes? Or to take multiple versions of a function&amp;#8212;or class, or whatever&amp;#8212;and figure out which one runs in less time? It would be super nice. Unfortunately, I have never really run across a very &lt;em&gt;simple&lt;/em&gt; way to do that. So I wrote a function, called &lt;code&gt;profile&lt;/code&gt;, which accepts a diagnostic messge and a lambda which wrap around the code you are interested in profiling.&lt;/p&gt;
@@ -106,6 +118,10 @@
     <title type="html">nanoc websites with binary data</title>
     <published>2011-06-07T06:00:00Z</published>
     <updated>2011-06-07T06:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/setting-up-a-nanoc-website/"/>
     <content type="html">&lt;p&gt;Nanoc is fantastic. I would definitely recommend it to anyone. However, any time I approach something new on a computer, there&amp;#8217;s always a struggle between the information available in the documentation (typically written by the developer, who already knows what&amp;#8217;s up) and the information I really need to know to use the software.&lt;/p&gt;
 &lt;h2&gt;Minor frustrations&lt;/h2&gt;
@@ -136,6 +152,10 @@
     <title type="html">Late-game unit testing</title>
     <published>2011-04-07T06:00:00Z</published>
     <updated>2011-04-07T06:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/late-game-unit-testing/"/>
     <content type="html">&lt;p&gt;I&amp;#8217;ve struggled with this issue recently as I go back and add tests to &lt;a href="http://www.github.com/rgantt/sake"&gt;sake&lt;/a&gt;, my pet &lt;span class="caps"&gt;MVC&lt;/span&gt; framework. The framework&amp;#8217;s deployed on enough sites&amp;#8212;albeit smallish ones&amp;#8212;to confirm that the core functionality is working as intended. When I encounter a framework defect during deployment of a sake site, I revisit the repository and update where necessary. I do &amp;#8220;thorough&amp;#8221; functional tests to ensure that I haven&amp;#8217;t introduced any obvious regressions and then continue to hack happily away on the site.&lt;/p&gt;
 &lt;p&gt;Of course, there are several problems with this sort of approach. First, even though functional tests don&amp;#8217;t expose any regression errors, this is not really sufficient evidence to conclude that there &lt;em&gt;actually&lt;/em&gt; weren&amp;#8217;t any regressions. I really don&amp;#8217;t know whether my routing and request-reading code response the same way to all meaningful input combinations that they did before. I only know that they &lt;em&gt;probably&lt;/em&gt; respond identically to &lt;em&gt;those input combinations I was already using.&lt;/em&gt; In short, one person running functional tests just doesn&amp;#8217;t stress enough of the system to grab anything but the lowest-hanging fruit.&lt;/p&gt;
