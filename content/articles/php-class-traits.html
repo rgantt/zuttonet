@@ -4,7 +4,7 @@ title: Horizontal reusability with traits
 tags: [ 'object-oriented programming', 'traits', 'horizontal reuse', 'inheritance', 'composition', 'php 5.4' ]
 created_at: Time.parse( "August 22, 2011" )
 author_name: Ryan
-excerpt: Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. In this article, I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern.
+excerpt: Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. Here I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern.
 ---
 
 Although maligned by many, the ability for a class to inherit from multiple parents can a good thing in some situations. For those working in PHP, multiple inheritance has never been an option; classes are limited to one parent, although they can be represent many other datatypes through the use of interfaces. Interfaces, however, can lead to a lot of code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, implementing the same method in multiple classes can contain a lot of overlap.
@@ -38,13 +38,13 @@ To give these notions a bit more backbone, let's run through a simple situation 
 
 h2. A diverging hierarchy
 
-Say you're in a situation where you must implement "nephew" classes to extend a class hierarchy. For the sake of clarity, imagine that you're working with a simple hierarchy like the one in the image below. At the head, you've got @Super@, from which all other classes will inherit. Below that, @Sub1@ and @Sub2@ contain some functionality useful to you, but both need to be extended. So you create your own subclasses, @MySub1@ and @MySub2@.
+Say you're in a situation where you must implement two nephew classes to extend a class hierarchy. For the sake of clarity, imagine that you're working with a simple hierarchy like the one in the image below. At the head, you've got @Super@, from which all other classes will inherit. Below that, @Sub1@ and @Sub2@ contain some functionality useful to you, but both need to be extended. So you create your own subclasses, @MySub1@ and @MySub2@.
 
 !=/images/articles/traits/basic.png!
 
 h2. Code duplication
 
-As you're going about your business, you realize that it would be great if both of these classes you've created could perform some action--call it @someFunction@. Your hierarchy now looks something like the following:
+As you're going about your business, you realize that it would be great if both classes you've created could perform the same action--call it @someFunction@. Your hierarchy now looks something like the following:
 
 !=/images/articles/traits/duplication.png!
 
@@ -54,32 +54,59 @@ The code on your screen looks something like the following:
 
 <script src="https://gist.github.com/1155168.js?file=duplicate-code-in-subclasses.php"></script>
 
-You can't just leave it like this--something must be done. How are you going to fix this problem? Let's look at the options.
+You can't just leave it like this--something must be done. Code duplication is bad, but you're sort of limited in how you can address this problem while still conforming to the rules of object-oriented programming. What's your next move? Let's look at the options.
 
 h3. Classical inheritance
 
-Ideally, you'd be able to push that common functionality up in the hierarchy to the nearest common ancestor of the two classes. In this case, you'd like to refactor @someFunction@ into @Super@. If you have the ability to modify @Super@, this might be the right thing to do. What if you don't? This is where traits come into play.
+Because you already have a well-defined inheritance hierarchy, you should be able to push this duplicated functionality upward to the nearest common ancestor of the two classes. In other words, you'd like to refactor @someFunction@ into @Super@. If you have the ability to modify @Super@, this is probably the right thing to do.
+
+After the refactoring, your class hierarchy will look like this:
 
 !=/images/articles/traits/inheritance.png!
 
+An example of the code representing this hierarchy might be something like this:
+
 <script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"></script>
+
+This is a great solution if you are able to edit the appropriate superclass. What about in a situation where you are limited in your ability to modify the class definitions that you're using? When working with existing frameworks, this often isn't an option. You can't just go into a superclass and make changes, since this will could break your code on future releases or introduce regression into other parts of your application. 
+
+So, if you are able to make the necessary modifications to your class hierarchy, this is the right solution. What if you aren't? This is where traits come into play.
 
 h3. Horizontal composition with traits
 
-If we can't move @someFunction@ up, then let's move it to the side.
+If we can't move @someFunction@ up, then let's move it to the side. Defining a new trait that includes the definition of @someFunction@--which is common to both @MySub1@ and @MySub2@ allows us to sidestep the issue of moving the method up the hierarchy. Instead, we create a chunk of reusable functionality that can be injected into our classes at definition time. 
+
+The same problem, solved by traits, looks like this:
 
 !=/images/articles/traits/trait.png!
 
+Hierarchicaly, this looks very similar to the original solution. However, we no longer have any duplication because the definition of @someFunction@ has been moved into @MyTrait@. Now, our nephew classes can simply @use MyTrait@ and have this method injected into their definitions:
+
 <script src="https://gist.github.com/1155168.js?file=use-trait-for-duplication.php"></script>
 
-h2. Implementation constraints in traits
+As you can see pretty clearly from the diagram above, traits promote horizontal composition because they allow specific pieces of functionality to be injected into any number of classes in a hierarchy both without duplication and without respect for that classes inherited types. Classical inheritance pushes functionality down through a hierarchy, while traits can be used to shove functionality sideways into a hierarchy.
 
-h3. Why traits aren't _exactly_ copypasta
+h2. Why traits aren't _exactly_ copypasta
+
+Earlier, I said that you could think of a trait as a chunk of code that is simply copied and pasted into whatever classes use it. While this is a useful mental model, it's not exactly right.
+
+To illustrated, consider the following example, which will result in a fatal error when executed. In a class, one cannot declare a method prototype with the @abstract@ modifier and then implement that method in the same class. @abstract@ is intended to enforce the implementation of some piece of behavior in a _lower_ class.
 
 <script src="https://gist.github.com/1155168.js?file=abs-fatal.php"></script>
 
-h3. 
+Now consider the following gist, which--if @use@ing a trait were identical to copying and pasting code--should do exactly the same thing.
+
 <script src="https://gist.github.com/1155168.js?file=abs-trait-no-problem.php"></script>
+
+Execute this code, however, does not result in a fatal error. Compilation finishes cleanly, and @"anything"@ is output to the screen.
+
+The reason for this is that the @abstract@ keyword means something slightly different in the context of a trait. Classes use @abstract@ to push responsibility down the chain; traits use it to enforce a contract with their includer.
+
+h3. Implementation constraints in traits
+
+Suppose for a second that you write a trait that does something with a database connection or file handle. You would prefer to handle some specific piece of the algorithm with the trait; ideally, the file or database connection would be handled some way else in the class. To enforce this, you might make a call to a method that the class including your trait should be required to define. For example, say you call @getFileHandle@ in one of your trait methods. Clearly, if the class using this trait does not have a @getFileHandle@ method defined somewhere in its hierarchy, you are going to get a runtime fatal error.
+
+If, however, you modify your trait to include an @abstract@ prototype for this method, you can push the runtime error to a compilation error. PHP simply won't allow you to use a trait unless you've satisfied its type definition. See how similar this is to multiple inheritance?
 
 h2. An application of traits: creating Singletons
 
