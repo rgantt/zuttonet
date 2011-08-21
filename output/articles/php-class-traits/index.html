@@ -1,0 +1,123 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>ZuttoNet - Horizontal reusability with traits</title>
+
+		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name="Title" content="ZuttoNet Web Development" />
+		<meta name="Author" content="ZuttoNet" />
+		<meta name="copyright" content="2007-2011 ZuttoNet WebMedia" />
+		<meta name="Language" content="en" />
+		<meta name="robots" content="index,follow" />
+
+		<link rel="stylesheet" type="text/css" media="screen" href="/main/style.css" />
+		<link rel="shortcut icon" href="/images/favicon.ico" />
+
+		<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			_uacct = "UA-2356219-1";
+			urchinTracker();
+		</script>
+	</head>
+
+	<body>
+		<div id="wrapper">
+			<div id="top_mid"></div>
+
+			<div id="top_nav">
+                <div class="menu">
+    <ul>
+        <li><a href="/">articles</a></li>
+        <li><a href="/pages/contact">about me</a></li>
+        <li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+    </ul>
+</div>
+			</div>
+		</div>
+
+			<div id="middle_content_half">
+				<div id="middle_left_half"></div>
+				<div id="middle_right_half"></div>
+			</div>
+
+			<div id="middle_content_half_lower"></div>
+
+			<div id="middle_content_half_mid"></div>
+			<div id="content_sub">            
+                <div id="article_content">
+                    <h1>Horizontal reusability with traits</h1>
+                    <h3>By Ryan on  in <a href="http://technorati.com/tag/object-oriented programming" rel="tag">object-oriented programming</a>, <a href="http://technorati.com/tag/traits" rel="tag">traits</a>, <a href="http://technorati.com/tag/horizontal reuse" rel="tag">horizontal reuse</a>, <a href="http://technorati.com/tag/inheritance" rel="tag">inheritance</a>, <a href="http://technorati.com/tag/composition" rel="tag">composition</a>, <a href="http://technorati.com/tag/php 5.4" rel="tag">php 5.4</a></h3>
+                    
+                    <p>Although maligned by many, the ability for a class to inherit from multiple parents can a good thing in some situations. For those working in <span class="caps">PHP</span>, multiple inheritance has never been an option; classes are limited to one parent, although they can be represent many other datatypes through the use of interfaces. Interfaces, however, can lead to a lot of code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, implementing the same method in multiple classes can contain a lot of overlap.</p>
+<p>Fortunately for us, <span class="caps">PHP</span> 5.4 includes a new feature, called <em>traits</em>, which allows us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow <span class="caps">PHP</span> classes to be extended <em>horizontally</em>, rather than vertically. In other words, we can use traits to write methods once and use them in a given strata of our hierarchy, without the multiple inheritance consequence of adding more static types to the classes we modify.</p>
+<h2>What traits are</h2>
+<p>A trait is very similar to a class. It is a collection of methods along with <em>some other objects&#8217; state</em>. Its use allows methods to be injected into a class at definition time; that sounds silly, because writing methods into classes is what we&#8217;re <em>already doing</em> at definition time. This is different. Traits allow you to define a method and then use it in <em>multiple classes</em>. If this sounds foreign, keep reading, because the examples that follow will illuminate things nicely.</p>
+<p>There are three main differences between a class and a trait:</p>
+<ol>
+	<li>A trait cannot be instantiated</li>
+	<li>A trait <em>should</em> avoid the creation of additional state</li>
+	<li>A trait cannot inherit from or implement another type</li>
+</ol>
+<p>After reading about these limitations, you might think that traits aren&#8217;t very useful. After all, they can&#8217;t do things that classes do, so why even bother? The best part about traits isn&#8217;t their limitations relative to classes, but how they can <em>augment</em> classes&#8217; capabilities.</p>
+<p>So what are the main features and selling points of traits?</p>
+<ol>
+	<li>traits allow methods to be written once and injected into multiple classes</li>
+	<li>traits allow class functionality to be extended without polluting the notion of &#8220;type&#8221;</li>
+	<li>traits can be composed&#8212;in other words, a trait may consist of other traits</li>
+	<li>classes can use multiple traits</li>
+	<li>classes can modify trait method visibility but not <em>vice versa</em></li>
+	<li>classes can refer to trait method names using aliases</li>
+</ol>
+<p>In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes at compile time. If that&#8217;s how you want to think of it, then go for it. Just keep in mind that it&#8217;s not <em>exactly</em> a copy/paste procedure, as I explain below.</p>
+<p>To give these notions a bit more backbone, let&#8217;s run through a simple situation involving code duplication that can be remedied by traits.</p>
+<h2>A diverging hierarchy</h2>
+<p>Say you&#8217;re in a situation where you must implement &#8220;nephew&#8221; classes to extend a class hierarchy. For the sake of clarity, imagine that you&#8217;re working with a simple hierarchy like the one in the image below. At the head, you&#8217;ve got <code>Super</code>, from which all other classes will inherit. Below that, <code>Sub1</code> and <code>Sub2</code> contain some functionality useful to you, but both need to be extended. So you create your own subclasses, <code>MySub1</code> and <code>MySub2</code>.</p>
+<p><img src="/images/articles/traits/basic.png" alt="" /></p>
+<h2>Code duplication</h2>
+<p>As you&#8217;re going about your business, you realize that it would be great if both of these classes you&#8217;ve created could perform some action&#8212;call it <code>someFunction</code>. Your hierarchy now looks something like the following:</p>
+<p><img src="/images/articles/traits/duplication.png" alt="" /></p>
+<p>At first, you&#8217;re just trying to get your code to work, so you write <code>someFunction</code> once, say in <code>MySub1</code> and then copy and paste it into <code>MySub2</code>. Your tests pass, and you realize what you&#8217;ve just done. The code on your screen looks something like the following:</p>
+<script src="https://gist.github.com/1155168.js?file=duplicate-code-in-subclasses.php"></script><h3>Fix by classical inheritance</h3>
+<p>Ideally, you&#8217;d be able to push that common functionality up in the hierarchy to the nearest common ancestor of the two classes. In this case, you&#8217;d like to refactor <code>someFunction</code> into <code>Super</code>. If you have the ability to modify <code>Super</code>, this might be the right thing to do. What if you don&#8217;t? This is where traits come into play.</p>
+<p><img src="/images/articles/traits/inheritance.png" alt="" /></p>
+<script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"></script><h3>Fix by traits&#8212;&#8220;horizontal composition&#8221;</h3>
+<p>If we can&#8217;t move <code>someFunction</code> up, then let&#8217;s move it to the side.</p>
+<p><img src="/images/articles/traits/trait.png" alt="" /></p>
+<script src="https://gist.github.com/1155168.js?file=use-trait-for-duplication.php"></script><h2>Implementation constraints in traits</h2>
+<h3>Why traits aren&#8217;t <em>exactly</em> copypasta</h3>
+<script src="https://gist.github.com/1155168.js?file=abs-fatal.php"></script><h3><script src="https://gist.github.com/1155168.js?file=abs-trait-no-problem.php"></script></h3>
+<h2>An application of traits: creating Singletons</h2>
+<script src="https://gist.github.com/1155168.js?file=singleton-trait.php"></script>
+					
+			Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
+			<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+			<hr />
+								<div id="disqus_thread"></div>
+					<script type="text/javascript">
+						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
+
+						// The following are highly recommended additional parameters. Remove the slashes in front to use.
+						var disqus_identifier = '/articles/php-class-traits/';
+						var disqus_url = 'http://www.zuttonet.com/articles/php-class-traits/';
+
+						/* * * DON'T EDIT BELOW THIS LINE * * */
+						(function() {
+							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+						})();
+					</script>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus</a>.</noscript>
+					<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+                </div>
+
+				<div id="footer-container">
+    <span>All content copyright Zutto LLC, 2007-2011.</span>
+	<span>Site generated by <a href="http://nanoc.stoneship.org/">nanoc</a>.</span>
+    <div id="footer">
+        <a href="/">HOME</a>|<a href="/pages/contact">ABOUT ME</a>|<a href="http://www.github.com/rgantt">FORK ME</a>|<a href="/posts.xml"><img src="/images/feed-icon-16x16.gif" style="border:0; vertical-align: bottom;" /></a>
+    </div>
+</div>
+			</div>
+	</body>
+</html>
