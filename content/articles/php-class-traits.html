@@ -1,7 +1,7 @@
 ---
 kind: article
 title: Horizontal reusability with traits
-tags: [ 'php', 'object-oriented', 'traits', 'horizontal', 'new features', 'inheritance', 'composition', 'php 5.4' ]
+tags: [ 'object-oriented programming', 'traits', 'horizontal reuse', 'inheritance', 'composition', 'php 5.4' ]
 created_at: Time.parse( "August 22, 2011" )
 author_name: Ryan
 excerpt: Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. In this article, I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern.
@@ -9,27 +9,54 @@ excerpt: Although PHP allows classes to implement more than one interface, it do
 
 Although maligned by many, the ability for a class to inherit from multiple parents can a good thing in some situations. For those working in PHP, multiple inheritance has never been an option; classes are limited to one parent, although they can be represent many other datatypes through the use of interfaces. Interfaces, however, can lead to a lot of code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, implementing the same method in multiple classes can contain a lot of overlap.
 
-Fortunately for us, PHP 5.4 includes a feature, called _traits_, which allows us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow PHP classes to be extended _horizontally_, rather than vertically. In other words, we can use traits to write methods once and use them in a given strata of our hierarchy, without the multiple inheritance consequence of added more static types to the classes we modify.
+Fortunately for us, PHP 5.4 includes a new feature, called _traits_, which allows us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow PHP classes to be extended _horizontally_, rather than vertically. In other words, we can use traits to write methods once and use them in a given strata of our hierarchy, without the multiple inheritance consequence of adding more static types to the classes we modify.
 
 h2. What traits are
 
-To these notions a bit more backbone, let's run through a simple situation involving code duplication that can be remedied by traits.
+A trait is very similar to a class. It is a collection of methods along with _some other objects' state_. Its use allows methods to be injected into a class at definition time; that sounds silly, because writing methods into classes is what we're _already doing_ at definition time. This is different. Traits allow you to define a method and then use it in _multiple classes_. If this sounds foreign, keep reading, because the examples that follow will illuminate things nicely.
+
+There are three main differences between a class and a trait: 
+
+# A trait cannot be instantiated
+# A trait _should_ avoid the creation of additional state
+# A trait cannot inherit from or implement another type
+
+After reading about these limitations, you might think that traits aren't very useful. After all, they can't do things that classes do, so why even bother? The best part about traits isn't their limitations relative to classes, but how they can _augment_ classes' capabilities.
+
+So what are the main features and selling points of traits?
+
+# traits allow methods to be written once and injected into multiple classes
+# traits allow class functionality to be extended without polluting the notion of "type"
+# traits can be composed--in other words, a trait may consist of other traits
+# classes can use multiple traits
+# classes can modify trait method visibility but not _vice versa_
+# classes can refer to trait method names using aliases
+
+In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes at compile time. If that's how you want to think of it, then go for it. Just keep in mind that it's not _exactly_ a copy/paste procedure, as I explain below.
+
+To give these notions a bit more backbone, let's run through a simple situation involving code duplication that can be remedied by traits.
 
 h2. A diverging hierarchy
 
-Say you're in a situation where you must implement "nephew" classes to extend a class hierarchy. For the sake of clarity (and without loss of generality), let's say that we have a simple hierarchy like the one described in the first gist below. At the top, you've got @Super@, from which all other classes will inherit. Below that, classes @Sub1@ and @Sub2@ contain functionality useful to you, but for whatever reason you need to extend them. So you create your own classes, @MySub1@ and @MySub2@ which inherit from them.
+Say you're in a situation where you must implement "nephew" classes to extend a class hierarchy. For the sake of clarity, imagine that you're working with a simple hierarchy like the one in the image below. At the head, you've got @Super@, from which all other classes will inherit. Below that, @Sub1@ and @Sub2@ contain some functionality useful to you, but both need to be extended. So you create your own subclasses, @MySub1@ and @MySub2@.
 
 !=/images/articles/traits/basic.png!
 
 h2. Code duplication
 
-As you're going about your business, you realize that it would be great if both of these classes you've created could perform some action--call it @someFunction@. What are your options?
+As you're going about your business, you realize that it would be great if both of these classes you've created could perform some action--call it @someFunction@. Your hierarchy now looks something like the following:
 
 !=/images/articles/traits/duplication.png!
 
+At first, you're just trying to get your code to work, so you write @someFunction@ once, say in @MySub1@. After you're satisfied that it does what you want it to, you copy and paste its source into @MySub2@. Your tests pass, and the full weight of what you've just done hits you like a train. 
+
+The code on your screen looks something like the following:
+
 <script src="https://gist.github.com/1155168.js?file=duplicate-code-in-subclasses.php"></script>
 
-h3. Fix by classical inheritance
+You can't just leave it like this--something must be done. How are you going to fix this problem? Let's look at the options.
+
+h3. Classical inheritance
 
 Ideally, you'd be able to push that common functionality up in the hierarchy to the nearest common ancestor of the two classes. In this case, you'd like to refactor @someFunction@ into @Super@. If you have the ability to modify @Super@, this might be the right thing to do. What if you don't? This is where traits come into play.
 
@@ -37,7 +64,7 @@ Ideally, you'd be able to push that common functionality up in the hierarchy to 
 
 <script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"></script>
 
-h3. Fix by traits--"horizontal composition"
+h3. Horizontal composition with traits
 
 If we can't move @someFunction@ up, then let's move it to the side.
 
