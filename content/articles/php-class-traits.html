@@ -7,38 +7,35 @@ author_name: Ryan
 excerpt: Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. Here I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern.
 ---
 
-Although maligned by many, the ability for a class to inherit from multiple parents can a good thing in some situations. For those working in PHP, multiple inheritance has never been an option; classes are limited to one parent, although they can implement many other datatypes through the use of interfaces. Interfaces can lead to a lot of code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, implementing the same method in multiple classes can contain a lot of overlap. There are also situations where classes in distinct hierarchies must implement functionality that is nearly identical.
+The ability for a class to inherit from multiple parents is maligned by many, but can be a good thing in some situations. For those working in PHP, multiple inheritance has never been an option; classes are limited to one parent, though they can implement many other datatypes through the use of interfaces. Interfaces can lead to code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, multiple classes that implement similar methods can contain a lot of overlap.
 
-Fortunately for us, PHP 5.4 includes a new feature, called _traits_, which allows us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow PHP classes to be extended _horizontally_, rather than vertically. In other words, we can use traits to write methods once and use them in a given strata of our hierarchy, without the multiple inheritance consequence of adding more static types to the classes we modify.
-
-The goal here isn't to determine whether traits are good or bad, but just to outline what they are and how they could be used.
+To address these concerns, PHP 5.4 includes a new feature called _traits_ which allow us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow PHP classes to be "extended" _horizontally_, rather than vertically. In other words, we can use traits to write methods once and use them in multiple classes, without the multiple inheritance consequence of adding more explicit type information to the classes we modify.
 
 h2. What traits are
 
-A trait is very similar to a class. It is a collection of methods along with _some other objects' state_. Its use allows methods to be injected into a class at definition time; that sounds silly, because writing methods into classes is what we're _already doing_ at definition time. This is different. Traits allow you to define a method and then use it in _multiple classes_. If this sounds foreign, keep reading, because the examples that follow will illuminate things nicely.
+A trait is very similar to a class. It is a collection of methods along with a specific notion of state. Traits use the state of the instance of a class into which they're inserted; they have access to @$this@. Their use allows methods to be injected into a class at run time. Traits allow you to define a method and then use it in _multiple classes_.
 
-There are three main differences between a class and a trait: 
+There are four main differences between a class and a trait: 
 
 # A trait cannot be instantiated
 # A trait _should_ avoid the creation of additional state
 # A trait cannot implement interfaces, but it can extend a class
+# A trait has no specific type, even if it has a parent class
 
-Number 2 is important; traits are not meant to be a replacement for classes. As soon as traits contain methods along with properties, they begin to simply resemble non-instantiable classes. In the current release, properties _are_ allowed within traits, but there is no formal provision for handling such state in the RFC "specification." Another concern is what happens to properties that are defined in a class once a trait is imported that defines properties of the same name. Could this change without warning? It's probably a good thing to avoid trait properties.
+Number 2 is important, because traits are not intended to be a replacement for classes. As soon as traits contain methods along with properties, they begin to resemble non-instantiable classes. In the current release, properties _are_ allowed within traits, but there is no formal provision for handling such state in the RFC "specification." It's probably a good thing to avoid trait properties.
 
-After reading about these limitations, you might begin to think that traits aren't very useful. After all, they can't do things that classes do, so why even bother? The best part about traits isn't their limitations relative to classes, but how they can _augment_ classes' capabilities.
+Traits can't do things that classes do, so why even bother? The good part isn't their limitation relative to classes, but how they can _augment_ classes' capabilities. Here are some reasons why traits are even worth bothering with:
 
-So why are traits even worth bothering with?
-
-# traits allow methods to be written once and injected into multiple classes
+# traits allow methods to be written once and injected into multiple, _derived_ classes
 # traits allow class functionality to be extended
 # traits can be composed--in other words, a trait may consist of other traits
 # classes can use multiple traits
 # classes can modify trait method visibility but not _vice versa_
 # classes can refer to trait method names using aliases
 
-In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes at compile time. Some even refer to it as "compiler-assisted copy and paste." If that's how you want to think of it, then go for it. Just keep in mind that it's not _exactly_ a copy/paste procedure, as I explain below.
+In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes. Some even refer to it as "compiler-assisted copy and paste." If that's how you want to think of it, then go for it. Just keep in mind that it's not _exactly_ a copy/paste procedure, as I explain below.
 
-Here follow two situations involving code duplication that can be remedied by traits. The first is a slightly more esoteric, but gives a good motivation on traits in general for those who are unfamiliar.
+Here follow two situations involving code duplication that can be remedied by traits. The first gives a good motivation on traits in general for those who are unfamiliar.
 
 h1. A divergent hierarchy
 
@@ -48,11 +45,11 @@ Say you're in a situation where you must implement two nephew classes to extend 
 
 h2. Code duplication
 
-As you proceed, you realize how great it would be if both classes perform the same action--call it @someFunction@. Your hierarchy now looks something like the following:
+Somewhere along the way, you realize how great it would be if both classes performed the same action--call it @someFunction@. Your hierarchy now looks something like the following:
 
 !=/images/articles/traits/duplication.png!
 
-At first, you write @someFunction@ once and stick it in @MySub1@. After you're satisfied that it does what you want it to, you copy and paste its source into @MySub2@. Your tests pass; then, the full weight of what you've just done hits you like a train. 
+At first, you write @someFunction@ once and stick it in @MySub1@. After you're satisfied that it behaves how you expect, you copy and paste its source into @MySub2@. Your tests pass; then, the full weight of what you've just done hits you like a train. 
 
 The code on your screen looks something like the following:
 
@@ -72,43 +69,43 @@ Here's an example of the code representing this change:
 
 <script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"></script>
 
-What about in a situation where you are unable to modify the class definitions that you're using? When working with existing frameworks, this can often be the case. You can't always just go into a superclass and make changes. These are the kind of situations where traits could come into play.
+What about in a situation where you are unable to modify the class definitions that you're using? When working with existing frameworks, this can often be the case. You can't always just go into a superclass and make changes. This is one situation where it might be nice to use a trait.
 
 h3. Horizontal composition with traits
 
-If we can't move @someFunction@ up, then let's move it to the side. Defining a new trait that includes the definition of @someFunction@--which is common to both @MySub1@ and @MySub2@ allows us to sidestep the file permissions issue. Instead, we create a chunk of reusable functionality that can be injected into our classes at definition time. 
+If we can't move @someFunction@ up, then let's move it to the side. Defining a new trait that includes the definition of @someFunction@--which is common to both @MySub1@ and @MySub2@ allows us to sidestep the file permissions issue. Instead, create a chunk of reusable functionality that can be injected into more than one class.
 
 The same problem as above, this time solved by traits, looks like this:
 
 !=/images/articles/traits/trait.png!
 
-Hierarchicaly, this looks very similar to the original solution. However, we no longer have any duplication because the definition of @someFunction@ has been moved into @MyTrait@. Now, our nephew classes can simply @use MyTrait@ and have this method injected into their definitions:
+Hierarchicaly, this looks very similar to the original solution. However, we no longer have any duplication because the definition of @someFunction@ has been moved into @MyTrait@. Now the nephew classes can simply @use MyTrait@ and have @someFunction@ injected into their definitions:
 
 <script src="https://gist.github.com/1155168.js?file=use-trait-for-duplication.php"></script>
 
-As you can see pretty clearly from the diagram above, traits promote horizontal composition because they allow specific pieces of functionality to be injected into any number of classes in a hierarchy both without duplication and without respect for that classes inherited types. Classical inheritance pushes functionality down through a hierarchy, while traits can be used to shove functionality sideways into a hierarchy.
+Traits promote horizontal composition because they allow specific pieces of functionality to be injected into any number of classes both without duplication and without respect for the classes' derived types. Classical inheritance pushes functionality down through a hierarchy, while traits can be used to shove functionality sideways into a hierarchy.
 
 h2. Traits aren't _exactly_ copypasta
 
-Earlier, I said that you could think of a trait as a chunk of code that is simply copied and pasted into whatever classes use it. While this is a useful mental model, it's not exactly right.
+Earlier, I said that you could think of traits as chunks of code that are simply copied and pasted into whatever classes use them. While this is a useful mental model, it's not exactly right.
 
-To illustrate this, consider the following example which will result in a fatal error when executed. In a single class, one cannot declare a method prototype with the @abstract@ modifier and then implement that method in the same class. @abstract@ is intended to enforce the implementation of some piece of behavior in a _lower_ class.
+To illustrate this, consider the following example which will result in a fatal error when executed. One cannot declare a method prototype with the @abstract@ modifier and then implement that method in the same class. @abstract@ enforces the implementation of some method in a _lower_ class.
 
 <script src="https://gist.github.com/1155168.js?file=abs-fatal.php"></script>
 
-Now consider the following gist, which--if @use@ing a trait were identical to copying and pasting code--should do exactly the same thing.
+If @use@ing a trait were identical to copying and pasting code, then the following gist should fail exactly the same way.
 
 <script src="https://gist.github.com/1155168.js?file=abs-trait-no-problem.php"></script>
 
-Executing this code, however, does not result in a fatal error. Compilation finishes cleanly, and @"anything"@ is shown on the screen.
+Executing it, however, does not result in a fatal error. Compilation finishes cleanly and @"anything"@ is shown on the screen.
 
 The reason for this is that the @abstract@ keyword means something slightly different in the context of a trait. Classes use @abstract@ to push responsibility down the chain; traits use it to enforce a contract with their includer. This is really straddling the line between "horizontal reusability" and multiple inheritance.
 
 h2. Implementation constraints in traits
 
-Suppose for a second that you write a trait that does something with a database connection or file handle. You would prefer to handle some specific, non-state dependent piece of the algorithm with the trait; state-dependent things should be left to classes. To enforce this, you might make a call in your trait to a method that the includer is required to define. For example, say you call @getFileHandle@ in one of your trait methods. If the class using this trait does not have a @getFileHandle@ method defined somewhere in its hierarchy, you are going to get a runtime fatal error.
+Maybe you've written a trait that does something with a database connection or file handle. Ideally you would handle some specific, non state-dependent piece of the algorithm with the trait; state-dependent things should be left to classes. To enforce this, you might make a call in your trait to a method that the includer is required to define. 
 
-If instead you modify your trait to include an @abstract@ prototype for this method, you can push the runtime error to a compilation error. PHP simply won't allow you to use a trait unless you've satisfied its type definition. See how similar this is to multiple inheritance?
+For example, say you call @getFileHandle@ in one of your trait methods. If the class using this trait does not have a @getFileHandle@ method defined somewhere in its hierarchy, you are going to get a runtime fatal error. If instead you modify your trait to include an @abstract@ prototype for this method, you can bubble the runtime error up to a compilation error. PHP simply won't allow you to use a trait unless you've satisfied its method contract. See how similar this is to multiple inheritance?
 
 h1. Distinct hierarchies
 
@@ -120,23 +117,24 @@ Adding tracing and logging functionality to a class is very common. Using a trai
 
 <script src="https://gist.github.com/1155168.js?file=logging-trait.php"></script>
 
-Dave Marshall provides another implementation of a Logging trait in "this article":http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/. The primary differences are that my pseudo Logging trait requires no external state (thanks to the way static local variables work in method bodies) and I skip the detail of providing an actual logger. Details!
+Dave Marshall provides another implementation of a Logging trait in "this article":http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/. The primary differences are that my pseudo Logging trait requires no external state (thanks to the way static local variables work in method bodies) and I skip the detail of providing an actual logger. Details, details!
 
 h2. Turning a class into a Singleton
 
-There are other situations where it is desirable to have horizontal reuse. Before, we looked at a situation where we were unable to move the method up into a parent class. What happens now if we find that common functionality is being spread across disjoint hierarchies? It isn't hard to imagine a situation where two classes might do something similar (log errors, for example).
+There are other situations where it is desirable to have horizontal reuse. What if we find that duplication is happening across disjoint hierarchies? It's not inconceivable that two classes might do something similar or be used in a similar way.
 
-Let's construct an example where we have multiple classes into which we would like to inject Singleton functionality:
+Let's construct an example where we have multiple classes into which we would like to inject Singleton* functionality:
 
 <script src="https://gist.github.com/1155168.js?file=singleton-trait.php"></script>
 
 h2. Parting thoughts
 
-Traits are an exciting new feature coming our way in PHP 5.4. Since 5.4 is still in alpha, it's difficult to say what exact features will make it to the stable release. There are several quirks and features not mentioned in this article (but that you could find in the references section), but my goal was simply to explain the feature at a high enough level that the exact implementation details at release could be easily understood.
+Traits are an exciting new feature coming our way in PHP 5.4. Since 5.4 is still in alpha, it's difficult to say what exact features will make it to the stable release. There are several quirks and features not mentioned in this article, but my goal was simply to explain the feature at a high enough level that the exact implementation details at release could be easily understood.
 
-h2. References
+h2. Additional resources
 
 * "PHP horizontal reuse RFC":https://wiki.php.net/rfc/horizontalreuse
 * "PHP Manual: Traits":http://php.net/manual/en/language.oop5.traits.php
 * "Hacker news discussion about Traits":http://news.ycombinator.com/item?id=1924442
 * "HelloWorld with Logging trait":http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/
+* "Why Singletons are Evil":http://blogs.msdn.com/b/scottdensmore/archive/2004/05/25/140827.aspx

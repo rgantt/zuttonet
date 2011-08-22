@@ -14,42 +14,37 @@
     <title type="html">Horizontal reusability with traits</title>
     <published>2011-08-22T06:00:00Z</published>
     <updated>2011-08-22T06:00:00Z</updated>
-    <author>
-      <name>Ryan</name>
-      <uri>http://www.zuttonet.com</uri>
-    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/php-class-traits/"/>
-    <content type="html">&lt;p&gt;Although maligned by many, the ability for a class to inherit from multiple parents can a good thing in some situations. For those working in &lt;span class="caps"&gt;PHP&lt;/span&gt;, multiple inheritance has never been an option; classes are limited to one parent, although they can implement many other datatypes through the use of interfaces. Interfaces can lead to a lot of code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, implementing the same method in multiple classes can contain a lot of overlap. There are also situations where classes in distinct hierarchies must implement functionality that is nearly identical.&lt;/p&gt;
-&lt;p&gt;Fortunately for us, &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4 includes a new feature, called &lt;em&gt;traits&lt;/em&gt;, which allows us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow &lt;span class="caps"&gt;PHP&lt;/span&gt; classes to be extended &lt;em&gt;horizontally&lt;/em&gt;, rather than vertically. In other words, we can use traits to write methods once and use them in a given strata of our hierarchy, without the multiple inheritance consequence of adding more static types to the classes we modify.&lt;/p&gt;
-&lt;p&gt;The goal here isn&amp;#8217;t to determine whether traits are good or bad, but just to outline what they are and how they could be used.&lt;/p&gt;
+    <content type="html">&lt;p&gt;The ability for a class to inherit from multiple parents is maligned by many, but can be a good thing in some situations. For those working in &lt;span class="caps"&gt;PHP&lt;/span&gt;, multiple inheritance has never been an option; classes are limited to one parent, though they can implement many other datatypes through the use of interfaces. Interfaces can lead to code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, multiple classes that implement similar methods can contain a lot of overlap.&lt;/p&gt;
+&lt;p&gt;To address these concerns, &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4 includes a new feature called &lt;em&gt;traits&lt;/em&gt; which allow us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow &lt;span class="caps"&gt;PHP&lt;/span&gt; classes to be &amp;#8220;extended&amp;#8221; &lt;em&gt;horizontally&lt;/em&gt;, rather than vertically. In other words, we can use traits to write methods once and use them in multiple classes, without the multiple inheritance consequence of adding more explicit type information to the classes we modify.&lt;/p&gt;
 &lt;h2&gt;What traits are&lt;/h2&gt;
-&lt;p&gt;A trait is very similar to a class. It is a collection of methods along with &lt;em&gt;some other objects&amp;#8217; state&lt;/em&gt;. Its use allows methods to be injected into a class at definition time; that sounds silly, because writing methods into classes is what we&amp;#8217;re &lt;em&gt;already doing&lt;/em&gt; at definition time. This is different. Traits allow you to define a method and then use it in &lt;em&gt;multiple classes&lt;/em&gt;. If this sounds foreign, keep reading, because the examples that follow will illuminate things nicely.&lt;/p&gt;
-&lt;p&gt;There are three main differences between a class and a trait:&lt;/p&gt;
+&lt;p&gt;A trait is very similar to a class. It is a collection of methods along with a specific notion of state. Traits use the state of the instance of a class into which they&amp;#8217;re inserted; they have access to &lt;code&gt;$this&lt;/code&gt;. Their use allows methods to be injected into a class at run time. Traits allow you to define a method and then use it in &lt;em&gt;multiple classes&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;There are four main differences between a class and a trait:&lt;/p&gt;
 &lt;ol&gt;
 	&lt;li&gt;A trait cannot be instantiated&lt;/li&gt;
 	&lt;li&gt;A trait &lt;em&gt;should&lt;/em&gt; avoid the creation of additional state&lt;/li&gt;
 	&lt;li&gt;A trait cannot implement interfaces, but it can extend a class&lt;/li&gt;
+	&lt;li&gt;A trait has no specific type, even if it has a parent class&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Number 2 is important; traits are not meant to be a replacement for classes. As soon as traits contain methods along with properties, they begin to simply resemble non-instantiable classes. In the current release, properties &lt;em&gt;are&lt;/em&gt; allowed within traits, but there is no formal provision for handling such state in the &lt;span class="caps"&gt;RFC&lt;/span&gt; &amp;#8220;specification.&amp;#8221; Another concern is what happens to properties that are defined in a class once a trait is imported that defines properties of the same name. Could this change without warning? It&amp;#8217;s probably a good thing to avoid trait properties.&lt;/p&gt;
-&lt;p&gt;After reading about these limitations, you might begin to think that traits aren&amp;#8217;t very useful. After all, they can&amp;#8217;t do things that classes do, so why even bother? The best part about traits isn&amp;#8217;t their limitations relative to classes, but how they can &lt;em&gt;augment&lt;/em&gt; classes&amp;#8217; capabilities.&lt;/p&gt;
-&lt;p&gt;So why are traits even worth bothering with?&lt;/p&gt;
+&lt;p&gt;Number 2 is important, because traits are not intended to be a replacement for classes. As soon as traits contain methods along with properties, they begin to resemble non-instantiable classes. In the current release, properties &lt;em&gt;are&lt;/em&gt; allowed within traits, but there is no formal provision for handling such state in the &lt;span class="caps"&gt;RFC&lt;/span&gt; &amp;#8220;specification.&amp;#8221; It&amp;#8217;s probably a good thing to avoid trait properties.&lt;/p&gt;
+&lt;p&gt;Traits can&amp;#8217;t do things that classes do, so why even bother? The good part isn&amp;#8217;t their limitation relative to classes, but how they can &lt;em&gt;augment&lt;/em&gt; classes&amp;#8217; capabilities. Here are some reasons why traits are even worth bothering with:&lt;/p&gt;
 &lt;ol&gt;
-	&lt;li&gt;traits allow methods to be written once and injected into multiple classes&lt;/li&gt;
+	&lt;li&gt;traits allow methods to be written once and injected into multiple, &lt;em&gt;derived&lt;/em&gt; classes&lt;/li&gt;
 	&lt;li&gt;traits allow class functionality to be extended&lt;/li&gt;
 	&lt;li&gt;traits can be composed&amp;#8212;in other words, a trait may consist of other traits&lt;/li&gt;
 	&lt;li&gt;classes can use multiple traits&lt;/li&gt;
 	&lt;li&gt;classes can modify trait method visibility but not &lt;em&gt;vice versa&lt;/em&gt;&lt;/li&gt;
 	&lt;li&gt;classes can refer to trait method names using aliases&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes at compile time. Some even refer to it as &amp;#8220;compiler-assisted copy and paste.&amp;#8221; If that&amp;#8217;s how you want to think of it, then go for it. Just keep in mind that it&amp;#8217;s not &lt;em&gt;exactly&lt;/em&gt; a copy/paste procedure, as I explain below.&lt;/p&gt;
-&lt;p&gt;Here follow two situations involving code duplication that can be remedied by traits. The first is a slightly more esoteric, but gives a good motivation on traits in general for those who are unfamiliar.&lt;/p&gt;
+&lt;p&gt;In a lot of ways, using a trait is like telling the interpreter to copy and paste source code from that trait into any number of classes. Some even refer to it as &amp;#8220;compiler-assisted copy and paste.&amp;#8221; If that&amp;#8217;s how you want to think of it, then go for it. Just keep in mind that it&amp;#8217;s not &lt;em&gt;exactly&lt;/em&gt; a copy/paste procedure, as I explain below.&lt;/p&gt;
+&lt;p&gt;Here follow two situations involving code duplication that can be remedied by traits. The first gives a good motivation on traits in general for those who are unfamiliar.&lt;/p&gt;
 &lt;h1&gt;A divergent hierarchy&lt;/h1&gt;
 &lt;p&gt;Say you&amp;#8217;re in a situation where you must implement two nephew classes to extend a class hierarchy. For the sake of clarity, imagine that you&amp;#8217;re working with a simple hierarchy like the one in the image below. At the head, you&amp;#8217;ve got &lt;code&gt;Super&lt;/code&gt;, from which all other classes will inherit. Below that, &lt;code&gt;Sub1&lt;/code&gt; and &lt;code&gt;Sub2&lt;/code&gt; contain some functionality useful to you, but both need to be extended. So you create your own subclasses, &lt;code&gt;MySub1&lt;/code&gt; and &lt;code&gt;MySub2&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/articles/traits/basic.png" alt="" /&gt;&lt;/p&gt;
 &lt;h2&gt;Code duplication&lt;/h2&gt;
-&lt;p&gt;As you proceed, you realize how great it would be if both classes perform the same action&amp;#8212;call it &lt;code&gt;someFunction&lt;/code&gt;. Your hierarchy now looks something like the following:&lt;/p&gt;
+&lt;p&gt;Somewhere along the way, you realize how great it would be if both classes performed the same action&amp;#8212;call it &lt;code&gt;someFunction&lt;/code&gt;. Your hierarchy now looks something like the following:&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/articles/traits/duplication.png" alt="" /&gt;&lt;/p&gt;
-&lt;p&gt;At first, you write &lt;code&gt;someFunction&lt;/code&gt; once and stick it in &lt;code&gt;MySub1&lt;/code&gt;. After you&amp;#8217;re satisfied that it does what you want it to, you copy and paste its source into &lt;code&gt;MySub2&lt;/code&gt;. Your tests pass; then, the full weight of what you&amp;#8217;ve just done hits you like a train.&lt;/p&gt;
+&lt;p&gt;At first, you write &lt;code&gt;someFunction&lt;/code&gt; once and stick it in &lt;code&gt;MySub1&lt;/code&gt;. After you&amp;#8217;re satisfied that it behaves how you expect, you copy and paste its source into &lt;code&gt;MySub2&lt;/code&gt;. Your tests pass; then, the full weight of what you&amp;#8217;ve just done hits you like a train.&lt;/p&gt;
 &lt;p&gt;The code on your screen looks something like the following:&lt;/p&gt;
 &lt;script src="https://gist.github.com/1155168.js?file=duplicate-code-in-subclasses.php"&gt;&lt;/script&gt;&lt;p&gt;You can&amp;#8217;t just leave it like this. Code duplication is bad. What&amp;#8217;s your next move?&lt;/p&gt;
 &lt;h3&gt;Classical inheritance&lt;/h3&gt;
@@ -57,38 +52,39 @@
 &lt;p&gt;After the refactoring, your class hierarchy will look like this:&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/articles/traits/inheritance.png" alt="" /&gt;&lt;/p&gt;
 &lt;p&gt;Here&amp;#8217;s an example of the code representing this change:&lt;/p&gt;
-&lt;script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"&gt;&lt;/script&gt;&lt;p&gt;What about in a situation where you are unable to modify the class definitions that you&amp;#8217;re using? When working with existing frameworks, this can often be the case. You can&amp;#8217;t always just go into a superclass and make changes. These are the kind of situations where traits could come into play.&lt;/p&gt;
+&lt;script src="https://gist.github.com/1155168.js?file=refactor-into-superclass.php"&gt;&lt;/script&gt;&lt;p&gt;What about in a situation where you are unable to modify the class definitions that you&amp;#8217;re using? When working with existing frameworks, this can often be the case. You can&amp;#8217;t always just go into a superclass and make changes. This is one situation where it might be nice to use a trait.&lt;/p&gt;
 &lt;h3&gt;Horizontal composition with traits&lt;/h3&gt;
-&lt;p&gt;If we can&amp;#8217;t move &lt;code&gt;someFunction&lt;/code&gt; up, then let&amp;#8217;s move it to the side. Defining a new trait that includes the definition of &lt;code&gt;someFunction&lt;/code&gt;&amp;#8212;which is common to both &lt;code&gt;MySub1&lt;/code&gt; and &lt;code&gt;MySub2&lt;/code&gt; allows us to sidestep the file permissions issue. Instead, we create a chunk of reusable functionality that can be injected into our classes at definition time.&lt;/p&gt;
+&lt;p&gt;If we can&amp;#8217;t move &lt;code&gt;someFunction&lt;/code&gt; up, then let&amp;#8217;s move it to the side. Defining a new trait that includes the definition of &lt;code&gt;someFunction&lt;/code&gt;&amp;#8212;which is common to both &lt;code&gt;MySub1&lt;/code&gt; and &lt;code&gt;MySub2&lt;/code&gt; allows us to sidestep the file permissions issue. Instead, create a chunk of reusable functionality that can be injected into more than one class.&lt;/p&gt;
 &lt;p&gt;The same problem as above, this time solved by traits, looks like this:&lt;/p&gt;
 &lt;p&gt;&lt;img src="/images/articles/traits/trait.png" alt="" /&gt;&lt;/p&gt;
-&lt;p&gt;Hierarchicaly, this looks very similar to the original solution. However, we no longer have any duplication because the definition of &lt;code&gt;someFunction&lt;/code&gt; has been moved into &lt;code&gt;MyTrait&lt;/code&gt;. Now, our nephew classes can simply &lt;code&gt;use MyTrait&lt;/code&gt; and have this method injected into their definitions:&lt;/p&gt;
-&lt;script src="https://gist.github.com/1155168.js?file=use-trait-for-duplication.php"&gt;&lt;/script&gt;&lt;p&gt;As you can see pretty clearly from the diagram above, traits promote horizontal composition because they allow specific pieces of functionality to be injected into any number of classes in a hierarchy both without duplication and without respect for that classes inherited types. Classical inheritance pushes functionality down through a hierarchy, while traits can be used to shove functionality sideways into a hierarchy.&lt;/p&gt;
+&lt;p&gt;Hierarchicaly, this looks very similar to the original solution. However, we no longer have any duplication because the definition of &lt;code&gt;someFunction&lt;/code&gt; has been moved into &lt;code&gt;MyTrait&lt;/code&gt;. Now the nephew classes can simply &lt;code&gt;use MyTrait&lt;/code&gt; and have &lt;code&gt;someFunction&lt;/code&gt; injected into their definitions:&lt;/p&gt;
+&lt;script src="https://gist.github.com/1155168.js?file=use-trait-for-duplication.php"&gt;&lt;/script&gt;&lt;p&gt;Traits promote horizontal composition because they allow specific pieces of functionality to be injected into any number of classes both without duplication and without respect for the classes&amp;#8217; derived types. Classical inheritance pushes functionality down through a hierarchy, while traits can be used to shove functionality sideways into a hierarchy.&lt;/p&gt;
 &lt;h2&gt;Traits aren&amp;#8217;t &lt;em&gt;exactly&lt;/em&gt; copypasta&lt;/h2&gt;
-&lt;p&gt;Earlier, I said that you could think of a trait as a chunk of code that is simply copied and pasted into whatever classes use it. While this is a useful mental model, it&amp;#8217;s not exactly right.&lt;/p&gt;
-&lt;p&gt;To illustrate this, consider the following example which will result in a fatal error when executed. In a single class, one cannot declare a method prototype with the &lt;code&gt;abstract&lt;/code&gt; modifier and then implement that method in the same class. &lt;code&gt;abstract&lt;/code&gt; is intended to enforce the implementation of some piece of behavior in a &lt;em&gt;lower&lt;/em&gt; class.&lt;/p&gt;
-&lt;script src="https://gist.github.com/1155168.js?file=abs-fatal.php"&gt;&lt;/script&gt;&lt;p&gt;Now consider the following gist, which&amp;#8212;if @use@ing a trait were identical to copying and pasting code&amp;#8212;should do exactly the same thing.&lt;/p&gt;
-&lt;script src="https://gist.github.com/1155168.js?file=abs-trait-no-problem.php"&gt;&lt;/script&gt;&lt;p&gt;Executing this code, however, does not result in a fatal error. Compilation finishes cleanly, and &lt;code&gt;"anything"&lt;/code&gt; is shown on the screen.&lt;/p&gt;
+&lt;p&gt;Earlier, I said that you could think of traits as chunks of code that are simply copied and pasted into whatever classes use them. While this is a useful mental model, it&amp;#8217;s not exactly right.&lt;/p&gt;
+&lt;p&gt;To illustrate this, consider the following example which will result in a fatal error when executed. One cannot declare a method prototype with the &lt;code&gt;abstract&lt;/code&gt; modifier and then implement that method in the same class. &lt;code&gt;abstract&lt;/code&gt; enforces the implementation of some method in a &lt;em&gt;lower&lt;/em&gt; class.&lt;/p&gt;
+&lt;script src="https://gist.github.com/1155168.js?file=abs-fatal.php"&gt;&lt;/script&gt;&lt;p&gt;If @use@ing a trait were identical to copying and pasting code, then the following gist should fail exactly the same way.&lt;/p&gt;
+&lt;script src="https://gist.github.com/1155168.js?file=abs-trait-no-problem.php"&gt;&lt;/script&gt;&lt;p&gt;Executing it, however, does not result in a fatal error. Compilation finishes cleanly and &lt;code&gt;"anything"&lt;/code&gt; is shown on the screen.&lt;/p&gt;
 &lt;p&gt;The reason for this is that the &lt;code&gt;abstract&lt;/code&gt; keyword means something slightly different in the context of a trait. Classes use &lt;code&gt;abstract&lt;/code&gt; to push responsibility down the chain; traits use it to enforce a contract with their includer. This is really straddling the line between &amp;#8220;horizontal reusability&amp;#8221; and multiple inheritance.&lt;/p&gt;
 &lt;h2&gt;Implementation constraints in traits&lt;/h2&gt;
-&lt;p&gt;Suppose for a second that you write a trait that does something with a database connection or file handle. You would prefer to handle some specific, non-state dependent piece of the algorithm with the trait; state-dependent things should be left to classes. To enforce this, you might make a call in your trait to a method that the includer is required to define. For example, say you call &lt;code&gt;getFileHandle&lt;/code&gt; in one of your trait methods. If the class using this trait does not have a &lt;code&gt;getFileHandle&lt;/code&gt; method defined somewhere in its hierarchy, you are going to get a runtime fatal error.&lt;/p&gt;
-&lt;p&gt;If instead you modify your trait to include an &lt;code&gt;abstract&lt;/code&gt; prototype for this method, you can push the runtime error to a compilation error. &lt;span class="caps"&gt;PHP&lt;/span&gt; simply won&amp;#8217;t allow you to use a trait unless you&amp;#8217;ve satisfied its type definition. See how similar this is to multiple inheritance?&lt;/p&gt;
+&lt;p&gt;Maybe you&amp;#8217;ve written a trait that does something with a database connection or file handle. Ideally you would handle some specific, non state-dependent piece of the algorithm with the trait; state-dependent things should be left to classes. To enforce this, you might make a call in your trait to a method that the includer is required to define.&lt;/p&gt;
+&lt;p&gt;For example, say you call &lt;code&gt;getFileHandle&lt;/code&gt; in one of your trait methods. If the class using this trait does not have a &lt;code&gt;getFileHandle&lt;/code&gt; method defined somewhere in its hierarchy, you are going to get a runtime fatal error. If instead you modify your trait to include an &lt;code&gt;abstract&lt;/code&gt; prototype for this method, you can bubble the runtime error up to a compilation error. &lt;span class="caps"&gt;PHP&lt;/span&gt; simply won&amp;#8217;t allow you to use a trait unless you&amp;#8217;ve satisfied its method contract. See how similar this is to multiple inheritance?&lt;/p&gt;
 &lt;h1&gt;Distinct hierarchies&lt;/h1&gt;
 &lt;p&gt;There are other situations in which it might make sense to use a trait.&lt;/p&gt;
 &lt;h2&gt;Adding logging capabilities to a class&lt;/h2&gt;
 &lt;p&gt;Adding tracing and logging functionality to a class is very common. Using a trait, we can wrap up all of the initialization and file-handling code into a reusable block and plug it into whatever class we prefer.&lt;/p&gt;
-&lt;script src="https://gist.github.com/1155168.js?file=logging-trait.php"&gt;&lt;/script&gt;&lt;p&gt;Dave Marshall provides another implementation of a Logging trait in &lt;a href="http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/"&gt;this article&lt;/a&gt;. The primary differences are that my pseudo Logging trait requires no external state (thanks to the way static local variables work in method bodies) and I skip the detail of providing an actual logger. Details!&lt;/p&gt;
+&lt;script src="https://gist.github.com/1155168.js?file=logging-trait.php"&gt;&lt;/script&gt;&lt;p&gt;Dave Marshall provides another implementation of a Logging trait in &lt;a href="http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/"&gt;this article&lt;/a&gt;. The primary differences are that my pseudo Logging trait requires no external state (thanks to the way static local variables work in method bodies) and I skip the detail of providing an actual logger. Details, details!&lt;/p&gt;
 &lt;h2&gt;Turning a class into a Singleton&lt;/h2&gt;
-&lt;p&gt;There are other situations where it is desirable to have horizontal reuse. Before, we looked at a situation where we were unable to move the method up into a parent class. What happens now if we find that common functionality is being spread across disjoint hierarchies? It isn&amp;#8217;t hard to imagine a situation where two classes might do something similar (log errors, for example).&lt;/p&gt;
-&lt;p&gt;Let&amp;#8217;s construct an example where we have multiple classes into which we would like to inject Singleton functionality:&lt;/p&gt;
+&lt;p&gt;There are other situations where it is desirable to have horizontal reuse. What if we find that duplication is happening across disjoint hierarchies? It&amp;#8217;s not inconceivable that two classes might do something similar or be used in a similar way.&lt;/p&gt;
+&lt;p&gt;Let&amp;#8217;s construct an example where we have multiple classes into which we would like to inject Singleton* functionality:&lt;/p&gt;
 &lt;script src="https://gist.github.com/1155168.js?file=singleton-trait.php"&gt;&lt;/script&gt;&lt;h2&gt;Parting thoughts&lt;/h2&gt;
-&lt;p&gt;Traits are an exciting new feature coming our way in &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4. Since 5.4 is still in alpha, it&amp;#8217;s difficult to say what exact features will make it to the stable release. There are several quirks and features not mentioned in this article (but that you could find in the references section), but my goal was simply to explain the feature at a high enough level that the exact implementation details at release could be easily understood.&lt;/p&gt;
-&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;Traits are an exciting new feature coming our way in &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4. Since 5.4 is still in alpha, it&amp;#8217;s difficult to say what exact features will make it to the stable release. There are several quirks and features not mentioned in this article, but my goal was simply to explain the feature at a high enough level that the exact implementation details at release could be easily understood.&lt;/p&gt;
+&lt;h2&gt;Additional resources&lt;/h2&gt;
 &lt;ul&gt;
 	&lt;li&gt;&lt;a href="https://wiki.php.net/rfc/horizontalreuse"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; horizontal reuse &lt;span class="caps"&gt;RFC&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href="http://php.net/manual/en/language.oop5.traits.php"&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; Manual: Traits&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href="http://news.ycombinator.com/item?id=1924442"&gt;Hacker news discussion about Traits&lt;/a&gt;&lt;/li&gt;
 	&lt;li&gt;&lt;a href="http://www.davedevelopment.co.uk/2011/08/06/traits-in-php-5-4-helloworld-with-logging-trait/"&gt;HelloWorld with Logging trait&lt;/a&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;a href="http://blogs.msdn.com/b/scottdensmore/archive/2004/05/25/140827.aspx"&gt;Why Singletons are Evil&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content>
     <summary type="html">Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. Here I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern.</summary>
   </entry>
@@ -97,10 +93,6 @@
     <title type="html">Anonymous recursion in PHP</title>
     <published>2011-08-08T06:00:00Z</published>
     <updated>2011-08-08T06:00:00Z</updated>
-    <author>
-      <name>Ryan</name>
-      <uri>http://www.zuttonet.com</uri>
-    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-recursion-php/"/>
     <content type="html">&lt;h2&gt;The scenario&lt;/h2&gt;
 &lt;p&gt;You&amp;#8217;re neck deep in 3-year old production code, amazon one-click checkout isn&amp;#8217;t working, and your wife just left you for someone who &amp;#8220;doesn&amp;#8217;t spend so much time writing unit tests.&amp;#8221; You need to save the world by implementing an algorithm using an anonymous function &lt;em&gt;now&lt;/em&gt;. Wait, what if the problem you need to solve is well served with a recursive approach? Maybe you attack the problem optimistically, starting with something like this:&lt;/p&gt;
@@ -130,10 +122,6 @@
     <title type="html">Anonymous functions and closure in PHP</title>
     <published>2011-07-15T06:00:00Z</published>
     <updated>2011-07-15T06:00:00Z</updated>
-    <author>
-      <name>Ryan</name>
-      <uri>http://www.zuttonet.com</uri>
-    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-functions-and-closure-php/"/>
     <content type="html">&lt;p&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of &lt;a href="http://php.net/manual/en/functions.anonymous.php"&gt;anonymous functions&lt;/a&gt; was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure.&lt;/p&gt;
 &lt;h2&gt;What is closure?&lt;/h2&gt;
@@ -182,10 +170,6 @@
     <title type="html">Simple performance profiling in PHP 5.3</title>
     <published>2011-06-13T06:00:00Z</published>
     <updated>2011-06-13T06:00:00Z</updated>
-    <author>
-      <name>Ryan</name>
-      <uri>http://www.zuttonet.com</uri>
-    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/dead-simple-profiling-in-php/"/>
     <content type="html">&lt;p&gt;I love finding new ways to use PHP&amp;#8217;s anonymous functions. One thing that caught my attention recently is how they make it so easy to wrap scope and functionality into little packages. These packages can easily be fed to a utility function, allowing the functionality contained therein to be wrapped and modified dynamically.&lt;/p&gt;
 &lt;p&gt;How nice would it be if there were a simple way to wrap up some script execution and figure out how long it takes? Or to take multiple versions of a function&amp;#8212;or class, or whatever&amp;#8212;and figure out which one runs in less time? It would be super nice. Unfortunately, I have never really run across a very &lt;em&gt;simple&lt;/em&gt; way to do that. So I wrote a function, called &lt;code&gt;profile&lt;/code&gt;, which accepts a diagnostic messge and a lambda which wrap around the code you are interested in profiling.&lt;/p&gt;
@@ -201,10 +185,6 @@
     <title type="html">nanoc websites with binary data</title>
     <published>2011-06-07T06:00:00Z</published>
     <updated>2011-06-07T06:00:00Z</updated>
-    <author>
-      <name>Ryan</name>
-      <uri>http://www.zuttonet.com</uri>
-    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/setting-up-a-nanoc-website/"/>
     <content type="html">&lt;p&gt;Nanoc is fantastic. I would definitely recommend it to anyone. However, any time I approach something new on a computer, there&amp;#8217;s always a struggle between the information available in the documentation (typically written by the developer, who already knows what&amp;#8217;s up) and the information I really need to know to use the software.&lt;/p&gt;
 &lt;h2&gt;Minor frustrations&lt;/h2&gt;
