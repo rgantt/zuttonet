@@ -1,8 +1,11 @@
 body {
 	margin: 0;
-	padding: 0;
-	background-color: #fff;
 	font: 0.75em tahoma, sans-serif;
+}
+
+a {
+    color: #FFA800; 
+	font-weight: bold;
 }
 
 blockquote {
@@ -10,7 +13,7 @@ blockquote {
 	padding: 0 1em 0 1em;
 	border: 1px dashed #ffffff;
 	background-color: #007fc8;
-	color: white;
+	color: #fff;
 }
 
 blockquote p cite {
@@ -26,14 +29,8 @@ article {
 }
 
 footer {
-	font-size: larger;
-    float: left; 
-    width: 100%; 
-    background-color: #fff; 
-    border-width: 0; 
-    border-style: none; 
     border-top: 1px solid #8E8E8E; 
-    margin-top: 15px;
+	clear: both;
 }
 
 footer span {
@@ -43,55 +40,32 @@ footer span {
 
 footer a {
 	float: right;
-	color: #545454;
-	text-decoration: none;
-	font: 0.8em tahoma, sans-serif;
     padding-right:1em;
-    padding-left:1em;
-}
-
-footer a:hover {
-	color: #EF7710;
-	text-decoration: underline;
-	font: 0.8em tahoma, sans-serif;
 }
 
 h1 + h3 {
 	font-weight: bold;
 }
 
-.menu {
-	font: 2.0em tahoma, sans-serif;
+#menu {
+	font-size: 2.0em;
 	letter-spacing: -1px;
-	list-style-type: none;
 	margin: 0px;
-	padding: 0px;
 	padding-left: 106px;
-	float:left;
-	text-align: left;
-}
-
-#top_nav {
 	position: absolute;
 	top: 16px;
 	background-color: #007fc8;
 	width: 66%;
 }
-
-.menu li {
-	text-align: center;
+#menu li {
 	display: inline;
-	margin: 0px;
-	padding: 0px;
-	color: #fff;
-	float: left;
 }
 
-.menu li:hover {
+#menu li:hover {
 	background-color: #00a2ff;
 }
 
-.menu li a:link,  .menu li a:visited {
+#menu li a, .menu li a:visited {
 	border-right: 1px solid #dedede;
 	display: block;
 	padding: 0 25px;
@@ -99,23 +73,9 @@ h1 + h3 {
 	float: left;
 	text-align: center;
 	color: #fff;
-	font-weight: bold;
 }
 
-.current_page {
-	float: left;
-	border-width: 0;
-	border-style: none;
-	border-right: 1px solid #dedede;
-	text-decoration: none;
-	color: #FFF;
-	padding: 0 25px;
-	text-align: center;
-	font-weight: bold;
-	background: #00a2ff;
-}
-
-.table_cell a {
+#table_cell a {
     color: #FFA800;
     text-decoration: underline;
     font-weight: bold;
@@ -135,13 +95,18 @@ h1 + h3 {
 	width: 100%;
 }
 
-#content_sub {
+#content-sub {
 	width: 100%;
 	height: auto;
 	position: absolute;
 	float: left;
 	top: 13em;
 	font: 1.2em tahoma, sans-serif;
+}
+
+#content {
+	position: absolute;
+	top: 255px;
 }
 
 #middle_left {
@@ -169,9 +134,6 @@ h1 + h3 {
 
 #middle_right_half {
 	float: left;
-	border-left: 0px solid #000;
-	border-top: 0px solid #000;
-	border-bottom: 0px solid #000;
 	height: 93px;
 	min-width: 340px;
 	background-image: url('/images/zuttonet_big_right_gray_half.png');
@@ -186,9 +148,6 @@ h1 + h3 {
 
 #middle_right {
 	float: left;
-	border-left: 0px solid #000;
-	border-top: 0px solid #000;
-	border-bottom: 0px solid #000;
 	height: 185px;
 	width: 340px;
 	background-image: url('/images/zuttonet_big_right_blue.png');
@@ -200,34 +159,16 @@ h1 + h3 {
 	padding: 35px 0 35px 35px;
 }
 
-#content {
-	position: absolute;
-	top: 255px;
-	background: #fff;
-	width: 100%;
-}
-
-#content a {
-    text-decoration: underline;
-    font-weight: bold;
-    color: #FFA800;    
-}
-
 #article-list {
     font-size: medium;
-    padding-left: 2em;
-    width: 60em;
 	list-style-type: none;
-}
-
-#article-list li {
-	display: block;
 }
 
 #contact_form {
 	position: relative;
 	float: left;
 	left: 42px;
+	clear: all;
 }
 
 #lower_mid {
@@ -238,25 +179,9 @@ h1 + h3 {
 	background: #b8b8b8;
 }
 
-#lower_mid p {
-	margin: 0px;
-	padding: 0px;
-	text-align: left;
-}
-
-#lower_mid span {
-	background: #fff;
-	height: 100%;
-	margin-left: 20px;
-	padding-left: 10px;
-	padding-right: 10px;
-}
-
 #top_mid {
 	position: absolute;
-	margin: 0 auto;
 	top: 8px;
-	left: 0;
 	height: 8px;
 	width: 66%;
 	background: #00a2ff;
