@@ -1,17 +1,17 @@
 <%= render "partials/content_layout" %>
 			<div id="content_sub">            
-                <div id="article_content">
+                <article id="article_content">
                     <h1><%=h item[:title] %></h1>
                     <h3>By <%=h item[:author_name] %> in <%= tags_for item %></h3>
                     
                     <%= yield %>
 					
-			Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
-			<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
-			<hr />
-			<%= render "partials/disqus" %>
-                </div>
+					Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
+					<hr />
+					
+<%= render "partials/disqus" %>
+                </article>
 
-				<%= render "partials/bottom_menu" %>
+<%= render "partials/bottom_menu" %>
 			</div>
 <%= render "partials/footer" %>

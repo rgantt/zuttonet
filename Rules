@@ -14,6 +14,9 @@ compile '/stylesheet/' do
   # don't filter or layout
 end
 
+compile '/js/*/' do
+end
+
 compile '/images/*/' do
 end
 
@@ -60,6 +63,10 @@ route '/resume/rpg_signature/' do
 end
 
 route '/images/*' do
+  item.identifier.chop + '.' + item[:extension]
+end
+
+route '/js/*' do
   item.identifier.chop + '.' + item[:extension]
 end
 

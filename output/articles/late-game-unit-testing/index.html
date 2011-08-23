@@ -1,37 +1,36 @@
-<!DOCTYPE HTML>
-<html lang="en">
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 	<head>
-		<title>ZuttoNet - Late-game unit testing</title>
+		<title>Zutto development - Late-game unit testing</title>
 
-		<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-		<meta name="Title" content="ZuttoNet Web Development" />
-		<meta name="Author" content="ZuttoNet" />
-		<meta name="copyright" content="2007-2011 ZuttoNet WebMedia" />
-		<meta name="Language" content="en" />
-		<meta name="robots" content="index,follow" />
-
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="author" content="Ryan Gantt">
+		<meta name="description" content="Web development blog focusing on PHP">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		
 		<link rel="stylesheet" type="text/css" media="screen" href="/main/style.css" />
 		<link rel="shortcut icon" href="/images/favicon.ico" />
 
-		<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
-		<script type="text/javascript">
-			_uacct = "UA-2356219-1";
-			urchinTracker();
-		</script>
+		<script src="/js/libs/modernizr-2.0.6.min.js"></script>
 	</head>
 
 	<body>
+		<a name="top"></a>
 		<div id="wrapper">
 			<div id="top_mid"></div>
 
 			<div id="top_nav">
-                <div class="menu">
-    <ul>
-        <li><a href="/">articles</a></li>
-        <li><a href="/pages/contact">about me</a></li>
-        <li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
-    </ul>
-</div>
+                				<div class="menu">
+					<ul>
+						<li><a href="/">articles</a></li>
+						<li><a href="/pages/contact">about me</a></li>
+						<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+					</ul>
+				</div>
 			</div>
 		</div>
 
@@ -44,9 +43,9 @@
 
 			<div id="middle_content_half_mid"></div>
 			<div id="content_sub">            
-                <div id="article_content">
+                <article id="article_content">
                     <h1>Late-game unit testing</h1>
-                    <h3>By Ryan on  in <a href="http://technorati.com/tag/testing" rel="tag">testing</a>, <a href="http://technorati.com/tag/test-driven development" rel="tag">test-driven development</a>, <a href="http://technorati.com/tag/unit tests" rel="tag">unit tests</a>, <a href="http://technorati.com/tag/old code" rel="tag">old code</a></h3>
+                    <h3>By Ryan in <a href="http://technorati.com/tag/testing" rel="tag">testing</a>, <a href="http://technorati.com/tag/test-driven development" rel="tag">test-driven development</a>, <a href="http://technorati.com/tag/unit tests" rel="tag">unit tests</a>, <a href="http://technorati.com/tag/old code" rel="tag">old code</a></h3>
                     
                     <p>I&#8217;ve struggled with this issue recently as I go back and add tests to <a href="http://www.github.com/rgantt/sake">sake</a>, my pet <span class="caps">MVC</span> framework. The framework&#8217;s deployed on enough sites&#8212;albeit smallish ones&#8212;to confirm that the core functionality is working as intended. When I encounter a framework defect during deployment of a sake site, I revisit the repository and update where necessary. I do &#8220;thorough&#8221; functional tests to ensure that I haven&#8217;t introduced any obvious regressions and then continue to hack happily away on the site.</p>
 <p>Of course, there are several problems with this sort of approach. First, even though functional tests don&#8217;t expose any regression errors, this is not really sufficient evidence to conclude that there <em>actually</em> weren&#8217;t any regressions. I really don&#8217;t know whether my routing and request-reading code response the same way to all meaningful input combinations that they did before. I only know that they <em>probably</em> respond identically to <em>those input combinations I was already using.</em> In short, one person running functional tests just doesn&#8217;t stress enough of the system to grab anything but the lowest-hanging fruit.</p>
@@ -58,35 +57,48 @@
 <p>What now? You&#8217;ve got your basic, highest-value functionality covered well. Your software works as it did before you started writing tests&#8212;you haven&#8217;t changed anything, except for the tests themselves, so there should be no possible way to introduce a regression. You&#8217;re pretty confident that new features and improvements won&#8217;t break the framework in unintended ways. You need to take the next step, but you&#8217;re just not sure what it is.</p>
 <p>Now it&#8217;s time to start revisiting all of those QA defects you wrote up in the previous section and making the quality changes to your framework. You need to be confident enough in your test coverage to know that you aren&#8217;t adding blatant regressions to your code. You probably don&#8217;t need 100% coverage (which is a myth, anyway), but you also don&#8217;t want to rely on your build to tell you whether everything&#8217;s ok. This is less of &#8220;test-driven development&#8221; and more of &#8220;test-driven test coverage improvements.&#8221; We&#8217;re going back through our code and adding coverage that really ought to have been there in the first place. In order to add this coverage, we might need to step in and clean up a few messes.</p>
 					
-			Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
-			<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
-			<hr />
-								<div id="disqus_thread"></div>
+					Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
+					<hr />
+					
+					<div id="disqus_thread"></div>
 					<script type="text/javascript">
-						var disqus_shortname = 'zuttonet'; // required: replace example with your forum shortname
-
-						// The following are highly recommended additional parameters. Remove the slashes in front to use.
+						var disqus_shortname = 'zuttonet';
 						var disqus_identifier = '/articles/late-game-unit-testing/';
 						var disqus_url = 'http://www.zuttonet.com/articles/late-game-unit-testing/';
 
-						/* * * DON'T EDIT BELOW THIS LINE * * */
 						(function() {
-							var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+							var dsq = document.createElement('script'); 
+							dsq.type = 'text/javascript'; 
+							dsq.async = true;
 							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
 							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 						})();
 					</script>
-					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus</a>.</noscript>
-					<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
-                </div>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments</a>.</noscript>
+                </article>
 
-				<div id="footer-container">
-    <span>All content copyright Zutto LLC, 2007-2011.</span>
-	<span>Site generated by <a href="http://nanoc.stoneship.org/">nanoc</a>.</span>
-    <div id="footer">
-        <a href="/">HOME</a>|<a href="/pages/contact">ABOUT ME</a>|<a href="http://www.github.com/rgantt">FORK ME</a>|<a href="/posts.xml"><img src="/images/feed-icon-16x16.gif" style="border:0; vertical-align: bottom;" /></a>
-    </div>
-</div>
+			<div id="footer-container">
+				<span>All content copyright Zutto LLC, 2007-2011.</span>
+				<div id="footer">
+					<a href="#top">#TOP</a>
+				</div>
 			</div>
+			</div>
+
+		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="/js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+
+		<script defer src="/js/plugins.js"></script>
+		<script defer src="/js/script.js"></script>
+
+		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+		
+		<script>
+			window._gaq = [['_setAccount','UA-2356219-1'],['_trackPageview'],['_trackPageLoadTime']];
+			Modernizr.load({
+				load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
+			});
+		</script>
 	</body>
 </html>
