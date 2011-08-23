@@ -20,42 +20,31 @@
 
 	<body>
 		<a name="top"></a>
-		<div id="wrapper">
-			<div id="top_mid"></div>
-
-			<div id="top_nav">
-				<div class="menu">
-					<ul>
-						<li><a href="/">articles</a></li>
-						<li><a href="/pages/contact">about me</a></li>
-						<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
+		
+		<div id="top_mid"></div>
+		<ul class="menu" id="top_nav" >
+			<li><a href="/">articles</a></li>
+			<li><a href="/pages/contact">about me</a></li>
+			<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+		</ul>
 		
 		<div id="middle_content">
-			<div id="middle_left">&nbsp;</div>
+			<div id="middle_left"></div>
 			<div id="middle_right">
-				<img src="/images/zuttonet_logo_white_white.png" alt="ZuttoNet WebMedia"/>
-				<p></p>
+				<img src="/images/zuttonet_logo_white_white.png" alt="zutto development articles"/>
 			</div>
 		</div>
 
 		<div id="lower_mid"></div>
 
-		<div id="lower_content">
-            <div id="article_list">
-<p>User-agent: *<br />
+		<div id="content">
+			<p>User-agent: *<br />
 Disallow: /</p>
-            </div>
             
-			<div id="footer-container">
+			<footer>
 				<span>All content copyright Zutto LLC, 2007-2011.</span>
-				<div id="footer">
-					<a href="#top">#TOP</a>
-				</div>
-			</div>
+				<a href="#top">#TOP</a>
+			</footer>
 		</div>
 
 		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -65,7 +54,7 @@ Disallow: /</p>
 		<script defer src="/js/plugins.js"></script>
 		<script defer src="/js/script.js"></script>
 
-		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+		<script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
 		
 		<script>
 			window._gaq = [['_setAccount','UA-2356219-1'],['_trackPageview'],['_trackPageLoadTime']];

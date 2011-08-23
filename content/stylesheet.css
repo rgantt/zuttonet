@@ -13,52 +13,19 @@ blockquote {
 	color: white;
 }
 
-.table_cell a {
-    color: #FFA800;
-    text-decoration: underline;
-    font-weight: bold;
-}
-
 blockquote p cite {
 	display: block;
 	text-align: right;
 	font-style: normal;
 }
 
-#contact_form {
-	position: relative;
-	float: left;
-	left: 42px;
+article {
+    font-size: medium;
+    padding-left: 5em;
+    width: 60em;
 }
 
-#lower_mid {
-	position: absolute;
-	top: 20.5em;
-	height: 15px;
-	width: 100%;
-	background: #b8b8b8;
-}
-
-#lower_mid p {
-	margin: 0px;
-	padding: 0px;
-	text-align: left;
-}
-
-#lower_mid span {
-	background: #fff;
-	height: 100%;
-	margin-left: 20px;
-	padding-left: 10px;
-	padding-right: 10px;
-}
-
-#wrapper {
-	height: 100%;
-	width: 100%;
-}
-
-#footer-container {
+footer {
 	font-size: larger;
     float: left; 
     width: 100%; 
@@ -69,69 +36,49 @@ blockquote p cite {
     margin-top: 15px;
 }
 
-#footer-container span {
+footer span {
     font-size: smaller;
     padding-left: 1em;
 }
 
-#footer {
-	background-color: #fff;
+footer a {
 	float: right;
-	color: #545454;
-	text-decoration: none;
-	padding-right: 25px;
-	font: 0.8em tahoma, sans-serif;
-}
-
-#footer a {
 	color: #545454;
 	text-decoration: none;
 	font: 0.8em tahoma, sans-serif;
     padding-right:1em;
     padding-left:1em;
 }
-#footer a:hover {
+
+footer a:hover {
 	color: #EF7710;
 	text-decoration: underline;
 	font: 0.8em tahoma, sans-serif;
 }
 
-#top_mid {
-	position: absolute;
-	margin: 0 auto;
-	top: 8px;
-	left: 0;
-	height: 8px;
-	width: 66%;
-	background: #00a2ff;
-}
-
-#top_nav {
-	position: absolute;
-	align: center;
-	top: 16px;
-	margin: 0 auto;
-	background-color: #007fc8;
-	height: 2.5em;
-	width: 66%;
+h1 + h3 {
+	font-weight: bold;
 }
 
 .menu {
 	font: 2.0em tahoma, sans-serif;
 	letter-spacing: -1px;
-	padding-left: 106px;
-}
-
-.menu ul {
 	list-style-type: none;
 	margin: 0px;
 	padding: 0px;
+	padding-left: 106px;
 	float:left;
 	text-align: left;
-	width: 100%;
 }
 
-.menu ul li {
+#top_nav {
+	position: absolute;
+	top: 16px;
+	background-color: #007fc8;
+	width: 66%;
+}
+
+.menu li {
 	text-align: center;
 	display: inline;
 	margin: 0px;
@@ -140,7 +87,11 @@ blockquote p cite {
 	float: left;
 }
 
-.menu ul li a:link,  .menu ul li a:visited {
+.menu li:hover {
+	background-color: #00a2ff;
+}
+
+.menu li a:link,  .menu li a:visited {
 	border-right: 1px solid #dedede;
 	display: block;
 	padding: 0 25px;
@@ -164,8 +115,10 @@ blockquote p cite {
 	background: #00a2ff;
 }
 
-.menu li:hover {
-	background-color: #00a2ff;
+.table_cell a {
+    color: #FFA800;
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 #middle_content {
@@ -193,21 +146,9 @@ blockquote p cite {
 
 #middle_left {
 	float: left;
-	color: #fff;
 	padding-left: 40px;
 	width: 66px;
 	height: 186px;
-	font: normal normal normal 14pt tahoma, sans-serif;
-	background-color: #fff;
-}
-
-#middle_left {
-	float: left;
-	color: #fff;
-	padding-left: 40px;
-	width: 66px;
-	height: 186px;
-	font: normal normal normal 14pt tahoma, sans-serif;
 	background-color: #fff;
 	background-image: url('/images/bg_left.png');
 	background-repeat: no-repeat;
@@ -256,36 +197,67 @@ blockquote p cite {
 }
 
 #middle_right img {
-	padding-top: 35px;
-	padding-bottom: 35px;
-	padding-left: 35px;
+	padding: 35px 0 35px 35px;
 }
 
-#lower_content {
+#content {
 	position: absolute;
 	top: 255px;
 	background: #fff;
 	width: 100%;
 }
 
-#lower_content a {
+#content a {
     text-decoration: underline;
     font-weight: bold;
     color: #FFA800;    
 }
 
-#article_content {
-    font-size: medium;
-    padding-left: 5em;
-    width: 60em;
-}
-
-#article_list {
+#article-list {
     font-size: medium;
     padding-left: 2em;
     width: 60em;
+	list-style-type: none;
 }
 
-h1 + h3 {
-	font-weight: bold;
+#article-list li {
+	display: block;
+}
+
+#contact_form {
+	position: relative;
+	float: left;
+	left: 42px;
+}
+
+#lower_mid {
+	position: absolute;
+	top: 20.5em;
+	height: 15px;
+	width: 100%;
+	background: #b8b8b8;
+}
+
+#lower_mid p {
+	margin: 0px;
+	padding: 0px;
+	text-align: left;
+}
+
+#lower_mid span {
+	background: #fff;
+	height: 100%;
+	margin-left: 20px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+#top_mid {
+	position: absolute;
+	margin: 0 auto;
+	top: 8px;
+	left: 0;
+	height: 8px;
+	width: 66%;
+	background: #00a2ff;
 }

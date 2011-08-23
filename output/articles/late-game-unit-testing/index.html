@@ -20,30 +20,24 @@
 
 	<body>
 		<a name="top"></a>
-		<div id="wrapper">
-			<div id="top_mid"></div>
+		
+		<div id="top_mid"></div>
+		<ul class="menu" id="top_nav" >
+			<li><a href="/">articles</a></li>
+			<li><a href="/pages/contact">about me</a></li>
+			<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+		</ul>
 
-			<div id="top_nav">
-                				<div class="menu">
-					<ul>
-						<li><a href="/">articles</a></li>
-						<li><a href="/pages/contact">about me</a></li>
-						<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
-					</ul>
-				</div>
-			</div>
+		<div id="middle_content_half">
+			<div id="middle_left_half"></div>
+			<div id="middle_right_half"></div>
 		</div>
 
-			<div id="middle_content_half">
-				<div id="middle_left_half"></div>
-				<div id="middle_right_half"></div>
-			</div>
+		<div id="middle_content_half_lower"></div>
 
-			<div id="middle_content_half_lower"></div>
-
-			<div id="middle_content_half_mid"></div>
+		<div id="middle_content_half_mid"></div>
 			<div id="content_sub">            
-                <article id="article_content">
+                <article>
                     <h1>Late-game unit testing</h1>
                     <h3>By Ryan in <a href="http://technorati.com/tag/testing" rel="tag">testing</a>, <a href="http://technorati.com/tag/test-driven development" rel="tag">test-driven development</a>, <a href="http://technorati.com/tag/unit tests" rel="tag">unit tests</a>, <a href="http://technorati.com/tag/old code" rel="tag">old code</a></h3>
                     
@@ -77,12 +71,10 @@
 					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments</a>.</noscript>
                 </article>
 
-			<div id="footer-container">
+			<footer>
 				<span>All content copyright Zutto LLC, 2007-2011.</span>
-				<div id="footer">
-					<a href="#top">#TOP</a>
-				</div>
-			</div>
+				<a href="#top">#TOP</a>
+			</footer>
 			</div>
 
 		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -92,7 +84,7 @@
 		<script defer src="/js/plugins.js"></script>
 		<script defer src="/js/script.js"></script>
 
-		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+		<script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
 		
 		<script>
 			window._gaq = [['_setAccount','UA-2356219-1'],['_trackPageview'],['_trackPageLoadTime']];

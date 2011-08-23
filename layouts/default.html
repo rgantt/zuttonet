@@ -2,28 +2,21 @@
 
 	<body>
 		<a name="top"></a>
-		<div id="wrapper">
-			<div id="top_mid"></div>
-
-			<div id="top_nav">
+		
+		<div id="top_mid"></div>
 <%= render "partials/menu" %>
-			</div>
-		</div>
 		
 		<div id="middle_content">
-			<div id="middle_left">&nbsp;</div>
+			<div id="middle_left"></div>
 			<div id="middle_right">
-				<img src="/images/zuttonet_logo_white_white.png" alt="ZuttoNet WebMedia"/>
-				<p></p>
+				<img src="/images/zuttonet_logo_white_white.png" alt="zutto development articles"/>
 			</div>
 		</div>
 
 		<div id="lower_mid"></div>
 
-		<div id="lower_content">
-            <div id="article_list">
-<%= yield %>
-            </div>
+		<div id="content">
+			<%= yield %>
             
 <%= render "partials/bottom_menu" %>
 		</div>

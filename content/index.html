@@ -1,11 +1,12 @@
 --- 
 title: Recent articles
 ---
-
+<ul id="article-list">
 <% sorted_articles.each do |article| %> 
-				<div> 
+				<li> 
 					<h1><%= link_to article[:title], article.identifier.chop %></h1> 
 					<h3>By <%= article[:author_name] %> on <%= Kernel.eval(article[:created_at]).strftime("%d %B %Y") %></h3>
 					<p><%= article[:excerpt] %> [<%= link_to "read more", article.identifier.chop %>]</p>
-				</div> 
+				</li> 
 <% end %> 
+			</ul>

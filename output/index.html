@@ -20,83 +20,74 @@
 
 	<body>
 		<a name="top"></a>
-		<div id="wrapper">
-			<div id="top_mid"></div>
-
-			<div id="top_nav">
-				<div class="menu">
-					<ul>
-						<li><a href="/">articles</a></li>
-						<li><a href="/pages/contact">about me</a></li>
-						<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
-					</ul>
-				</div>
-			</div>
-		</div>
+		
+		<div id="top_mid"></div>
+		<ul class="menu" id="top_nav" >
+			<li><a href="/">articles</a></li>
+			<li><a href="/pages/contact">about me</a></li>
+			<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+		</ul>
 		
 		<div id="middle_content">
-			<div id="middle_left">&nbsp;</div>
+			<div id="middle_left"></div>
 			<div id="middle_right">
-				<img src="/images/zuttonet_logo_white_white.png" alt="ZuttoNet WebMedia"/>
-				<p></p>
+				<img src="/images/zuttonet_logo_white_white.png" alt="zutto development articles"/>
 			</div>
 		</div>
 
 		<div id="lower_mid"></div>
 
-		<div id="lower_content">
-            <div id="article_list">
+		<div id="content">
+			<ul id="article-list">
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/php-class-traits">Horizontal reusability with traits</a></h1> 
 					<h3>By Ryan on 22 August 2011</h3>
 					<p>Although PHP allows classes to implement more than one interface, it does not support multiple inheritance. Lack of multiple inheritance can lead to code duplication in certain situations, which is contrary to the goals of reusable object-oriented programming. Here I explore a couple of these situations and traits, a new language-level feature in PHP 5.4 that has been added to address this concern. [<a href="/articles/php-class-traits">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/anonymous-recursion-php">Anonymous recursion in PHP</a></h1> 
 					<h3>By Ryan on 08 August 2011</h3>
 					<p>I've been working toward building a useful set of concepts to apply some functional programming techniques in PHP 5.3. Yes, _functional_ programming in PHP. In this article, I explore the concept of anonymous recursion, something that becomes important in situations where we are using anonymous functions to solve problems that are well suited to a recursive approach. [<a href="/articles/anonymous-recursion-php">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/anonymous-functions-and-closure-php">Anonymous functions and closure in PHP</a></h1> 
 					<h3>By Ryan on 15 July 2011</h3>
 					<p>PHP 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of anonymous functions was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure. [<a href="/articles/anonymous-functions-and-closure-php">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/dead-simple-profiling-in-php">Simple performance profiling in PHP 5.3</a></h1> 
 					<h3>By Ryan on 13 June 2011</h3>
 					<p>PHP's standard library makes it pretty easy to whip up a quick set of timing functions to wrap around your code. Maybe I'm jaded by ruby's blocks, but I would love to see that my profiling code is getting everything I want and _only_ those things I want. So I decided to sit down and whip up something quick and simple to alleviate my neurosis. [<a href="/articles/dead-simple-profiling-in-php">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/setting-up-a-nanoc-website">nanoc websites with binary data</a></h1> 
 					<h3>By Ryan on 07 June 2011</h3>
 					<p>nanoc is a wonderful little gem that uses Ruby/ERB to create statically-generated websites. It saves you the trouble of firing up a database connection on every request while still allowing you the flexibility of Ruby to generate your sites. I wrote a quick walkthrough to bridge the gap between what I learned through the nanoc documentation and what I needed to know to finish converting my own site. [<a href="/articles/setting-up-a-nanoc-website">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/late-game-unit-testing">Late-game unit testing</a></h1> 
 					<h3>By Ryan on 07 April 2011</h3>
 					<p>Sometimes I need to add features to old projects for which I didn't write unit tests. Sometimes I neglect to write unit tests during development in new projects. Oops. In situations like these, what are some approaches to then going back and adding "necessary" test coverage? [<a href="/articles/late-game-unit-testing">read more</a>]</p>
-				</div> 
+				</li> 
  
-				<div> 
+				<li> 
 					<h1><a href="/articles/decorating-php-classes-without-common-ancestor">Decorating PHP classes without a common ancestor</a></h1> 
 					<h3>By Ryan on 15 March 2011</h3>
 					<p>The decorator pattern is used to extend the public interface of an object at runtime. Because of this, it exposes a nice way to modify the behavior of objects instantiated from classes in other libraries, even ones to whose source you may not have access. The decorator pattern is commonly described as a pair of classes--a component and a decorator--which derive from a common ancestor. However, we relax this restriction using PHP language features. [<a href="/articles/decorating-php-classes-without-common-ancestor">read more</a>]</p>
-				</div> 
-
-            </div>
+				</li> 
+ 
+			</ul>
             
-			<div id="footer-container">
+			<footer>
 				<span>All content copyright Zutto LLC, 2007-2011.</span>
-				<div id="footer">
-					<a href="#top">#TOP</a>
-				</div>
-			</div>
+				<a href="#top">#TOP</a>
+			</footer>
 		</div>
 
 		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
@@ -106,7 +97,7 @@
 		<script defer src="/js/plugins.js"></script>
 		<script defer src="/js/script.js"></script>
 
-		<script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
+		<script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
 		
 		<script>
 			window._gaq = [['_setAccount','UA-2356219-1'],['_trackPageview'],['_trackPageLoadTime']];
