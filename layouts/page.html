@@ -1,6 +1,13 @@
-<%= render "partials/content_layout" %>
-			<div id="content-sub">
-				<%= yield %>
-                <%= render "partials/bottom_menu" %>
-			</div>
+<%= render "partials/header", :source => "page" %>
+
+	<body>
+		<a name="top"></a>
+		
+		<div id="top_mid"></div>
+<%= render "partials/menu" %>
+
+		<article>
+<%= yield %>
+		</article>
+<%= render "partials/bottom_menu" %>
 <%= render "partials/footer" %>

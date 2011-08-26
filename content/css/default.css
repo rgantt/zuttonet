@@ -1,0 +1,183 @@
+a {
+    color: #FFA800; 
+	font-weight: bold;
+}
+
+blockquote {
+	margin: 1em 0 1em 0;
+	padding: 0 1em 0 1em;
+	border: 1px dashed #ffffff;
+	background-color: #007fc8;
+	color: #fff;
+}
+
+blockquote p cite {
+	display: block;
+	text-align: right;
+	font-style: normal;
+}
+
+article {
+    font-size: medium;
+    padding-left: 5em;
+    width: 60em;
+}
+
+footer {
+    border-top: 1px solid #8E8E8E; 
+	clear: both;
+}
+
+footer span {
+    font-size: smaller;
+    padding-left: 1em;
+}
+
+footer a {
+	float: right;
+    padding-right:1em;
+}
+
+h1 + h3 {
+	font-weight: bold;
+}
+
+#menu {
+	font-size: 2.0em;
+	letter-spacing: -1px;
+	margin: 0px;
+	padding-left: 106px;
+	position: absolute;
+	top: 16px;
+	background-color: #007fc8;
+	width: 66%;
+}
+#menu li {
+	display: inline;
+}
+
+#menu li:hover {
+	background-color: #00a2ff;
+}
+
+#menu li a, .menu li a:visited {
+	border-right: 1px solid #dedede;
+	display: block;
+	padding: 0 25px;
+	text-decoration: none;
+	float: left;
+	text-align: center;
+	color: #fff;
+}
+
+#table_cell a {
+    color: #FFA800;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+#middle_content {
+	background-color: #007fc8;
+	top: 4.5em;
+	position: absolute;
+	width: 100%;
+}
+
+#middle_content_half {
+	background-color: #646464;
+	top: 5.5em;
+	position: absolute;
+	width: 100%;
+}
+
+#content-sub {
+	width: 100%;
+	height: auto;
+	position: absolute;
+	float: left;
+	top: 13em;
+	font: 1.2em;
+}
+
+#content {
+	position: absolute;
+	top: 18em;
+}
+
+#middle_left {
+	float: left;
+	padding-left: 40px;
+	width: 66px;
+	height: 186px;
+	background-color: #fff;
+	background-image: url('/images/bg_left.png');
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+#middle_left_half {
+	float: left;
+	color: #fff;
+	width: 45px;
+	height: 93px;
+	font: normal normal normal 14pt;
+	background-color: #fff;
+	background-image: url('/images/bg_left_half.png');
+	background-repeat: no-repeat;
+	background-position: top right;
+}
+
+#middle_right_half {
+	float: left;
+	height: 93px;
+	min-width: 340px;
+	background-image: url('/images/zuttonet_big_right_gray_half.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+#middle_left p {
+	padding-top: 15px;
+	padding-left: 15px;
+}
+
+#middle_right {
+	float: left;
+	height: 185px;
+	width: 340px;
+	background-image: url('/images/zuttonet_big_right_blue.png');
+	background-repeat: no-repeat;
+	background-position: top left;
+}
+
+#middle_right img {
+	padding: 35px 0 35px 35px;
+}
+
+#article-list {
+    font-size: medium;
+	list-style-type: none;
+}
+
+#contact_form {
+	position: relative;
+	float: left;
+	left: 42px;
+	clear: all;
+}
+
+#lower_mid {
+	position: absolute;
+	top: 16.5em;
+	height: 15px;
+	width: 100%;
+	background: #b8b8b8;
+}
+
+#top_mid {
+	position: absolute;
+	top: 8px;
+	height: 8px;
+	width: 66%;
+	background: #00a2ff;
+}

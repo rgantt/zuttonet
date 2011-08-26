@@ -1,8 +1,3 @@
-body {
-	margin: 0;
-	font: 0.75em tahoma, sans-serif;
-}
-
 a {
     color: #FFA800; 
 	font-weight: bold;
@@ -101,7 +96,7 @@ h1 + h3 {
 	position: absolute;
 	float: left;
 	top: 13em;
-	font: 1.2em tahoma, sans-serif;
+	font: 1.2em;
 }
 
 #content {
@@ -125,7 +120,7 @@ h1 + h3 {
 	color: #fff;
 	width: 45px;
 	height: 93px;
-	font: normal normal normal 14pt tahoma, sans-serif;
+	font: normal normal normal 14pt;
 	background-color: #fff;
 	background-image: url('/images/bg_left_half.png');
 	background-repeat: no-repeat;
