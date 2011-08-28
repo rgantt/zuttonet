@@ -19,8 +19,10 @@ There are four main differences between a class and a trait:
 
 # A trait cannot be instantiated
 # A trait _should_ avoid the creation of additional state
-# A trait cannot implement interfaces, but it can extend a class
-# A trait has no specific type, even if it has a parent class
+# A trait cannot implement an interface -but it can extend a class- _or_ extend a class
+# A trait has no specific type -even if it has a parent class-
+
+(A note on the above: the first alpha release of PHP 5.4 allowed traits to extend classes. Since there are no useful semantics associated with this feature, it's been "written up as a defect":https://bugs.php.net/bug.php?id=55524 and will be corrected in the next release.)
 
 Number 2 is important, because traits are not intended to be a replacement for classes. As soon as traits contain methods along with properties, they begin to resemble non-instantiable classes. In the current release, properties _are_ allowed within traits, but there is no formal provision for handling such state in the RFC "specification." It's probably a good thing to avoid trait properties.
 
