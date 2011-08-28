@@ -27,9 +27,10 @@
 &lt;ol&gt;
 	&lt;li&gt;A trait cannot be instantiated&lt;/li&gt;
 	&lt;li&gt;A trait &lt;em&gt;should&lt;/em&gt; avoid the creation of additional state&lt;/li&gt;
-	&lt;li&gt;A trait cannot implement interfaces, but it can extend a class&lt;/li&gt;
-	&lt;li&gt;A trait has no specific type, even if it has a parent class&lt;/li&gt;
+	&lt;li&gt;A trait cannot implement an interface &lt;del&gt;but it can extend a class&lt;/del&gt; &lt;em&gt;or&lt;/em&gt; extend a class&lt;/li&gt;
+	&lt;li&gt;A trait has no specific type &lt;del&gt;even if it has a parent class&lt;/del&gt;&lt;/li&gt;
 &lt;/ol&gt;
+&lt;p&gt;(A note on the above: the first alpha release of &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4 allowed traits to extend classes. Since there are no useful semantics associated with this feature, it&amp;#8217;s been &lt;a href="https://bugs.php.net/bug.php?id=55524"&gt;written up as a defect&lt;/a&gt; and will be corrected in the next release.)&lt;/p&gt;
 &lt;p&gt;Number 2 is important, because traits are not intended to be a replacement for classes. As soon as traits contain methods along with properties, they begin to resemble non-instantiable classes. In the current release, properties &lt;em&gt;are&lt;/em&gt; allowed within traits, but there is no formal provision for handling such state in the &lt;span class="caps"&gt;RFC&lt;/span&gt; &amp;#8220;specification.&amp;#8221; It&amp;#8217;s probably a good thing to avoid trait properties.&lt;/p&gt;
 &lt;p&gt;Traits can&amp;#8217;t do things that classes do, so why even bother? The good part isn&amp;#8217;t their limitation relative to classes, but how they can &lt;em&gt;augment&lt;/em&gt; classes&amp;#8217; capabilities. Here are some reasons why traits are even worth bothering with:&lt;/p&gt;
 &lt;ol&gt;

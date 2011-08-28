@@ -53,9 +53,10 @@
 <ol>
 	<li>A trait cannot be instantiated</li>
 	<li>A trait <em>should</em> avoid the creation of additional state</li>
-	<li>A trait cannot implement interfaces, but it can extend a class</li>
-	<li>A trait has no specific type, even if it has a parent class</li>
+	<li>A trait cannot implement an interface <del>but it can extend a class</del> <em>or</em> extend a class</li>
+	<li>A trait has no specific type <del>even if it has a parent class</del></li>
 </ol>
+<p>(A note on the above: the first alpha release of <span class="caps">PHP</span> 5.4 allowed traits to extend classes. Since there are no useful semantics associated with this feature, it&#8217;s been <a href="https://bugs.php.net/bug.php?id=55524">written up as a defect</a> and will be corrected in the next release.)</p>
 <p>Number 2 is important, because traits are not intended to be a replacement for classes. As soon as traits contain methods along with properties, they begin to resemble non-instantiable classes. In the current release, properties <em>are</em> allowed within traits, but there is no formal provision for handling such state in the <span class="caps">RFC</span> &#8220;specification.&#8221; It&#8217;s probably a good thing to avoid trait properties.</p>
 <p>Traits can&#8217;t do things that classes do, so why even bother? The good part isn&#8217;t their limitation relative to classes, but how they can <em>augment</em> classes&#8217; capabilities. Here are some reasons why traits are even worth bothering with:</p>
 <ol>
