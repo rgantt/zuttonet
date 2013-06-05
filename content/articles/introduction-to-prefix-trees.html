@@ -1,0 +1,127 @@
+---
+kind: article
+title: "The prefix tree: an easily-sortable map implementation for string keys"
+tags: [ 'java', 'javascript', 'data structure', 'map', 'trie', 'sorting', 'prefix tree', 'tree' ]
+created_at: Time.parse( "June 5, 2013" )
+author_name: Ryan
+excerpt: One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.
+---
+
+One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.
+
+h2. Overview
+
+A prefix tree--or, more commonly, trie, for re<em>trie</em>val--is a data structure optimized to store values associated with a string key. Tries are useful because they allow fast (<code>O(L)</code>, where <code>L</code> is the length of the word) lookup on string keys, scale easily for large collections of small, short words, and (in many easy implementations) provide built-in lexicographical sorting on traversal.
+
+Being a <code>Map</code>, prefix trees support at least the <code>put(K key, V value)</code>, <code>get(K key)</code>, and <code>delete(K key)</code> operations. In addition, it is very simple (and desirable) to also support <code>traverse()</code>, particularly for an in-order (and therefore lexicographically-ordered) traversal.
+
+Despite the fact that, in a basic trie, the value of each node will contain only one character, the type <code>K</code> of the key is typically <code>String</code>. Implementations worry about how to allocate the component parts of that string across nodes internally. Most simply, they will be allocated letter-by-letter, although some implementations chunk substrings on nodes that have one or fewer children.
+
+h2. Internal structure
+
+Each node of a prefix tree represents a letter in a word, except for the root node, which contains a pointer to all possible word starts. In other words, each node (including the root), has up to 27 children (one for each letter of the alphabet, plus another for a possible leaf node which contains a value).
+
+Traversing downward, a word can be constructed by following any path from the root down to a leaf node. Note that even nodes that contain a leaf node as a child may be substrings of other words; the implementations of <code>get</code> and <code>put</code> give meaning to this, not the structure of the trie itself.
+
+Below is a graphical representation of a trie that contains the following set of words: <code>am</code>, <code>and</code>, <code>cat</code>.
+
+!=/images/articles/tries/simple_trie.png!
+
+You can see that since <code>am</code> and <code>and</code> share a prefix, we reduce space usage by only having to store the <code>a</code> one time.
+
+h2. Implementation algorithms
+
+Prefix trees are just that: trees. For the sake of simplicity, let's assume that our trie stores ASCII words. In that case, each node in our tree has 27 children. With 27 children to manage, we need to consider what kind of data structure to use. Using a list would be fine (since list implementations abound), but lookup is slow (and insertion into a sorted list is slow). We could use an array and rely on translating between characters and integers to make the indexing work. Instead, let's use a <code>TreeMap</code>. This will give us quick lookup and insertion on the character keys (<code>O(log n)</code>, where <code>n</code> is the number of children, which is at most 27).
+
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=node.java"></script>
+
+Our prefix tree is composed of <code>Node</code> objects that contain <code>String</code> keys and values of type <code>V</code>, which is a type-parameter of our <code>Trie</code> class. Now let's walk through some simple implementations of the operations we need to support.
+
+h3. get
+
+Retrieving the value for a given key within a trie (if it exists), is simple:
+
+1. Grab the first letter of the key; call it <code>k</code>
+2. Get a pointer to the child of the current node whose key matches <code>k</code>
+3. If the child is <code>null</code>, return <code>null</code>
+4. Else if the key and <code>k</code> are equal (i.e. the key has length 1), return the child's value <code>V</code>
+5. Else <code>get</code> the value of the remainder of the key, rooted at the child
+
+Here's an implementation of the above algorithm:
+
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=get.java"></script>
+
+h3. put
+
+Trie insertion follows a very similar process to retrieval. Instead of failing early on <code>null</code> children, though, insertion creates the children required for each letter of the key. Then, when there are no keys left, the final child is assigned a value (turning it into a leaf).
+
+Here's the process:
+
+1. Grab the first letter of the key; call it <code>k</code>
+2. Get a pointer to the child of the current node whose key matches <code>k</code>
+3. If the child is <code>null</code>, create a new <code>Node</code> with key <code>k</code> and add it as a child to the current node
+4. If the key and <code>k</code> are equal (i.e. the key has length 1), assign the child's value <code>V</code>
+4. Else <code>put</code> the value of the remainder of the key, rooted at the child
+
+Here's an implementation of the above algorithm:
+
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=put.java"></script>
+
+h3. delete
+
+Unlike insertion and retrieval, which I've implemented above recursively, I decided to take a slightly different approach for removal. Trie removal has some slightly more subtle edge cases that need to be accounted for. To do so effectively, I opt to traverse the entire key from root to leaf, pushing the nodes onto a stack as I do. Then, by popping elements off the stack, I'm able to move from the leaf toward the root and handle the edge cases without worrying about recursion.
+
+The algorithm goes like this:
+
+1. For a given key, save a list of nodes that represents the path from the root to a leaf
+2. If the path reaches a leaf other than the one representing the key, return null
+3. Start at the leaf. Set its value to null.
+4. While there is path left to traverse and we aren't looking at vapid nodes,
+4. a. Remove those nodes from their parent
+
+By "vapid" node in this case, I mean nodes whose values are null and who have no children. These are nodes that should be culled from the trie, otherwise they will contribute unnecessary runtime to subsequent tree traversals, insertions, and deletions.
+
+Here's an implementation of the above algorithm.
+
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=delete.java"></script>
+
+Note that this implementation relies on a helper, <code>pathFromLeaf(Stack, String)</code>. I've omitted the implementation of that helper in this example, but you can find it on "github":https://gist.github.com/rgantt/5711830.
+
+h3. traverse
+
+Traversal can also be easily implemented recursively. The tricky part about getting the recursion right on traversal is figuring out when a word should be added to the list, and what subkey should pushed into the recursive call.
+
+We can describe the steps like this:
+
+1. If the current node has a non-null value, prefix and we should add it to the list
+2. For each of the current node's children with non-null keys, append those keys to prefix and traverse them
+
+We start the call at the root with an empty list.
+
+Here's an implementation:
+
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=traverse.java"></script>
+
+In order to ensure that we are getting the keys back in alphabetical order, we perform a pre-order traversal.
+
+h2. Time complexity
+
+Like mentioned previously, prefix trees are well suited to lookups on string keys. Let's walk through an example.
+
+Assume that we have a well-populated tree with many overlapping keys. Now we call <code>get</code> with key <code>"cab"</code>, which exists in the trie. Working our way through the algorithm implemented above, we will look for the child of the root node that has the key <code>c</code>. In our implementation, this lookup happens in <code>O(log c)</code> time (because of our choice of <code>TreeMap</code> instead of <code>HashMap</code> to take advantage of the ordering property of binary trees), where <code>c</code> is the number of characters in the tree; this is at most 26. Note that if we used a <code>HashMap</code> or array instead, this lookup would happen in <code>O(1)</code> time. For small <code>c</code> this is hardly worth mentioning.
+
+The time complexity we are interested in, though, is not a function of the number of children of a given node, but a function of the number of words mapped in the trie itself. The <code>O(log c)</code> lookup mentioned above occurs once for each character in the string key. So the lookup time is directly proportional to the length of the string, but effectively constant in terms of the number of elements mapped in the trie--<code>O(1)</code>.
+
+
+h2. Final thoughts
+
+Prefix trees are a nice data structure that's especially tailored for mapping words to values. You get all of the benefits of the map type interface, and none of the costs of collisions that are inevitable as the number of mappings a hash table stores increases.
+
+h3. Implementation trade-offs
+
+1. How would the time complexity change if we used a data structure other than a <code>TreeMap</code> to store a node's children? Under what circumstances is that trade-off worth making?
+
+h2. References
+
+* "Complete implementation (including unit tests) of this example":https://gist.github.com/rgantt/5711830
+* "Implementation of a prefix tree in Javascript":https://github.com/rgantt/jsterbate/blob/master/lib/trie.js

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>http://www.zuttonet.com/</id>
   <title>Zutto Development Articles</title>
-  <updated>2011-08-22T06:00:00Z</updated>
+  <updated>2013-05-28T07:00:00Z</updated>
   <link rel="alternate" href="http://www.zuttonet.com/"/>
   <link rel="self" href="http://www.zuttonet.com/posts.xml"/>
   <author>
@@ -10,10 +10,89 @@
     <uri>http://www.zuttonet.com</uri>
   </author>
   <entry>
+    <id>tag:www.zuttonet.com,2013-05-28:/articles/introduction-to-prefix-trees/</id>
+    <title type="html">The prefix tree: an easily-sortable map implementation for string keys</title>
+    <published>2013-05-28T07:00:00Z</published>
+    <updated>2013-05-28T07:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
+    <link rel="alternate" href="http://www.zuttonet.com/articles/introduction-to-prefix-trees/"/>
+    <content type="html">&lt;p&gt;One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.&lt;/p&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;A prefix tree&amp;#8212;or, more commonly, trie, for re&lt;em&gt;trie&lt;/em&gt;val&amp;#8212;is a data structure optimized to store values associated with a string key. Tries are useful because they allow fast (&lt;code&gt;O(L)&lt;/code&gt;, where &lt;code&gt;L&lt;/code&gt; is the length of the word) lookup on string keys, scale easily for large collections of small, short words, and (in many easy implementations) provide built-in lexicographical sorting on traversal.&lt;/p&gt;
+&lt;p&gt;Being a &lt;code&gt;Map&lt;/code&gt;, prefix trees support at least the &lt;code&gt;put(K key, V value)&lt;/code&gt;, &lt;code&gt;get(K key)&lt;/code&gt;, and &lt;code&gt;delete(K key)&lt;/code&gt; operations. In addition, it is very simple (and desirable) to also support &lt;code&gt;traverse()&lt;/code&gt;, particularly for an in-order (and therefore lexicographically-ordered) traversal.&lt;/p&gt;
+&lt;p&gt;Despite the fact that, in a basic trie, the value of each node will contain only one character, the type &lt;code&gt;K&lt;/code&gt; of the key is typically &lt;code&gt;String&lt;/code&gt;. Implementations worry about how to allocate the component parts of that string across nodes internally. Most simply, they will be allocated letter-by-letter, although some implementations chunk substrings on nodes that have one or fewer children.&lt;/p&gt;
+&lt;h2&gt;Internal structure&lt;/h2&gt;
+&lt;p&gt;Each node of a prefix tree represents a letter in a word, except for the root node, which contains a pointer to all possible word starts. In other words, each node (including the root), has up to 27 children (one for each letter of the alphabet, plus another for a possible leaf node which contains a value).&lt;/p&gt;
+&lt;p&gt;Traversing downward, a word can be constructed by following any path from the root down to a leaf node. Note that even nodes that contain a leaf node as a child may be substrings of other words; the implementations of &lt;code&gt;get&lt;/code&gt; and &lt;code&gt;put&lt;/code&gt; give meaning to this, not the structure of the trie itself.&lt;/p&gt;
+&lt;p&gt;Below is a graphical representation of a trie that contains the following set of words: &lt;code&gt;am&lt;/code&gt;, &lt;code&gt;and&lt;/code&gt;, &lt;code&gt;cat&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img src="/images/articles/tries/simple_trie.png" alt="" /&gt;&lt;/p&gt;
+&lt;p&gt;You can see that since &lt;code&gt;am&lt;/code&gt; and &lt;code&gt;and&lt;/code&gt; share a prefix, we reduce space usage by only having to store the &lt;code&gt;a&lt;/code&gt; one time.&lt;/p&gt;
+&lt;h2&gt;Implementation algorithms&lt;/h2&gt;
+&lt;p&gt;Prefix trees are just that: trees. For the sake of simplicity, let&amp;#8217;s assume that our trie stores &lt;span class="caps"&gt;ASCII&lt;/span&gt; words. In that case, each node in our tree has 27 children. With 27 children to manage, we need to consider what kind of data structure to use. Using a list would be fine (since list implementations abound), but lookup is slow (and insertion into a sorted list is slow). We could use an array and rely on translating between characters and integers to make the indexing work. Instead, let&amp;#8217;s use a &lt;code&gt;TreeMap&lt;/code&gt;. This will give us quick lookup and insertion on the character keys (&lt;code&gt;O(log n)&lt;/code&gt;, where &lt;code&gt;n&lt;/code&gt; is the number of children, which is at most 27).&lt;/p&gt;
+&lt;script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=node.java"&gt;&lt;/script&gt;&lt;p&gt;Our prefix tree is composed of &lt;code&gt;Node&lt;/code&gt; objects that contain &lt;code&gt;String&lt;/code&gt; keys and values of type &lt;code&gt;V&lt;/code&gt;, which is a type-parameter of our &lt;code&gt;Trie&lt;/code&gt; class. Now let&amp;#8217;s walk through some simple implementations of the operations we need to support.&lt;/p&gt;
+&lt;h3&gt;get&lt;/h3&gt;
+&lt;p&gt;Retrieving the value for a given key within a trie (if it exists), is simple:&lt;/p&gt;
+&lt;p&gt;1. Grab the first letter of the key; call it &lt;code&gt;k&lt;/code&gt;&lt;br /&gt;
+2. Get a pointer to the child of the current node whose key matches &lt;code&gt;k&lt;/code&gt;&lt;br /&gt;
+3. If the child is &lt;code&gt;null&lt;/code&gt;, return &lt;code&gt;null&lt;/code&gt;&lt;br /&gt;
+4. Else if the key and &lt;code&gt;k&lt;/code&gt; are equal (i.e. the key has length 1), return the child&amp;#8217;s value &lt;code&gt;V&lt;/code&gt;&lt;br /&gt;
+5. Else &lt;code&gt;get&lt;/code&gt; the value of the remainder of the key, rooted at the child&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation of the above algorithm:&lt;/p&gt;
+&lt;script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=get.java"&gt;&lt;/script&gt;&lt;h3&gt;put&lt;/h3&gt;
+&lt;p&gt;Trie insertion follows a very similar process to retrieval. Instead of failing early on &lt;code&gt;null&lt;/code&gt; children, though, insertion creates the children required for each letter of the key. Then, when there are no keys left, the final child is assigned a value (turning it into a leaf).&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s the process:&lt;/p&gt;
+&lt;p&gt;1. Grab the first letter of the key; call it &lt;code&gt;k&lt;/code&gt;&lt;br /&gt;
+2. Get a pointer to the child of the current node whose key matches &lt;code&gt;k&lt;/code&gt;&lt;br /&gt;
+3. If the child is &lt;code&gt;null&lt;/code&gt;, create a new &lt;code&gt;Node&lt;/code&gt; with key &lt;code&gt;k&lt;/code&gt; and add it as a child to the current node&lt;br /&gt;
+4. If the key and &lt;code&gt;k&lt;/code&gt; are equal (i.e. the key has length 1), assign the child&amp;#8217;s value &lt;code&gt;V&lt;/code&gt;&lt;br /&gt;
+4. Else &lt;code&gt;put&lt;/code&gt; the value of the remainder of the key, rooted at the child&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation of the above algorithm:&lt;/p&gt;
+&lt;script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=put.java"&gt;&lt;/script&gt;&lt;h3&gt;delete&lt;/h3&gt;
+&lt;p&gt;Unlike insertion and retrieval, which I&amp;#8217;ve implemented above recursively, I decided to take a slightly different approach for removal. Trie removal has some slightly more subtle edge cases that need to be accounted for. To do so effectively, I opt to traverse the entire key from root to leaf, pushing the nodes onto a stack as I do. Then, by popping elements off the stack, I&amp;#8217;m able to move from the leaf toward the root and handle the edge cases without worrying about recursion.&lt;/p&gt;
+&lt;p&gt;The algorithm goes like this:&lt;/p&gt;
+&lt;p&gt;1. For a given key, save a list of nodes that represents the path from the root to a leaf&lt;br /&gt;
+2. If the path reaches a leaf other than the one representing the key, return null&lt;br /&gt;
+3. Start at the leaf. Set its value to null.&lt;br /&gt;
+4. While there is path left to traverse and we aren&amp;#8217;t looking at vapid nodes,&lt;br /&gt;
+4. a. Remove those nodes from their parent&lt;/p&gt;
+&lt;p&gt;By &amp;#8220;vapid&amp;#8221; node in this case, I mean nodes whose values are null and who have no children. These are nodes that should be culled from the trie, otherwise they will contribute unnecessary runtime to subsequent tree traversals, insertions, and deletions.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation of the above algorithm.&lt;/p&gt;
+&lt;script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=delete.java"&gt;&lt;/script&gt;&lt;p&gt;Note that this implementation relies on a helper, &lt;code&gt;pathFromLeaf(Stack, String)&lt;/code&gt;. I&amp;#8217;ve omitted the implementation of that helper in this example, but you can find it on &lt;a href="https://gist.github.com/rgantt/5711830"&gt;github&lt;/a&gt;.&lt;/p&gt;
+&lt;h3&gt;traverse&lt;/h3&gt;
+&lt;p&gt;Traversal can also be easily implemented recursively. The tricky part about getting the recursion right on traversal is figuring out when a word should be added to the list, and what subkey should pushed into the recursive call.&lt;/p&gt;
+&lt;p&gt;We can describe the steps like this:&lt;/p&gt;
+&lt;p&gt;1. If the current node has a non-null value, prefix and we should add it to the list&lt;br /&gt;
+2. For each of the current node&amp;#8217;s children with non-null keys, append those keys to prefix and traverse them&lt;/p&gt;
+&lt;p&gt;We start the call at the root with an empty list.&lt;/p&gt;
+&lt;p&gt;Here&amp;#8217;s an implementation:&lt;/p&gt;
+&lt;script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=traverse.java"&gt;&lt;/script&gt;&lt;p&gt;In order to ensure that we are getting the keys back in alphabetical order, we perform a pre-order traversal.&lt;/p&gt;
+&lt;h2&gt;Time complexity&lt;/h2&gt;
+&lt;p&gt;Like mentioned previously, prefix trees are well suited to lookups on string keys. Let&amp;#8217;s walk through an example.&lt;/p&gt;
+&lt;p&gt;Assume that we have a well-populated tree with many overlapping keys. Now we call &lt;code&gt;get&lt;/code&gt; with key &lt;code&gt;"cab"&lt;/code&gt;, which exists in the trie. Working our way through the algorithm implemented above, we will look for the child of the root node that has the key &lt;code&gt;c&lt;/code&gt;. In our implementation, this lookup happens in &lt;code&gt;O(log c)&lt;/code&gt; time (because of our choice of &lt;code&gt;TreeMap&lt;/code&gt; instead of &lt;code&gt;HashMap&lt;/code&gt; to take advantage of the ordering property of binary trees), where &lt;code&gt;c&lt;/code&gt; is the number of characters in the tree; this is at most 26. Note that if we used a &lt;code&gt;HashMap&lt;/code&gt; or array instead, this lookup would happen in &lt;code&gt;O(1)&lt;/code&gt; time. For small &lt;code&gt;c&lt;/code&gt; this is hardly worth mentioning.&lt;/p&gt;
+&lt;p&gt;The time complexity we are interested in, though, is not a function of the number of children of a given node, but a function of the number of words mapped in the trie itself. The &lt;code&gt;O(log c)&lt;/code&gt; lookup mentioned above occurs once for each character in the string key. So the lookup time is directly proportional to the length of the string, but effectively constant in terms of the number of elements mapped in the trie&amp;#8212;&lt;code&gt;O(1)&lt;/code&gt;.&lt;/p&gt;
+&lt;h2&gt;Final thoughts&lt;/h2&gt;
+&lt;p&gt;Prefix trees are a nice data structure that&amp;#8217;s especially tailored for mapping words to values. You get all of the benefits of the map type interface, and none of the costs of collisions that are inevitable as the number of mappings a hash table stores increases.&lt;/p&gt;
+&lt;h3&gt;Implementation trade-offs&lt;/h3&gt;
+&lt;p&gt;1. How would the time complexity change if we used a data structure other than a &lt;code&gt;TreeMap&lt;/code&gt; to store a node&amp;#8217;s children? Under what circumstances is that trade-off worth making?&lt;/p&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+	&lt;li&gt;&lt;a href="https://gist.github.com/rgantt/5711830"&gt;Complete implementation (including unit tests) of this example&lt;/a&gt;&lt;/li&gt;
+	&lt;li&gt;&lt;a href="https://github.com/rgantt/jsterbate/blob/master/lib/trie.js"&gt;Implementation of a prefix tree in Javascript&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content>
+    <summary type="html">One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.</summary>
+  </entry>
+  <entry>
     <id>tag:www.zuttonet.com,2011-08-22:/articles/php-class-traits/</id>
     <title type="html">Horizontal reusability with traits</title>
-    <published>2011-08-22T06:00:00Z</published>
-    <updated>2011-08-22T06:00:00Z</updated>
+    <published>2011-08-22T07:00:00Z</published>
+    <updated>2011-08-22T07:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/php-class-traits/"/>
     <content type="html">&lt;p&gt;The ability for a class to inherit from multiple parents is maligned by many, but can be a good thing in some situations. For those working in &lt;span class="caps"&gt;PHP&lt;/span&gt;, multiple inheritance has never been an option; classes are limited to one parent, though they can implement many other datatypes through the use of interfaces. Interfaces can lead to code duplication in improperly-factored inheritance hierarchies. Even in well-architected hierarchies, multiple classes that implement similar methods can contain a lot of overlap.&lt;/p&gt;
 &lt;p&gt;To address these concerns, &lt;span class="caps"&gt;PHP&lt;/span&gt; 5.4 includes a new feature called &lt;em&gt;traits&lt;/em&gt; which allow us to do something that seems an awful lot like multiple inheritance at first glance. Traits allow &lt;span class="caps"&gt;PHP&lt;/span&gt; classes to be &amp;#8220;extended&amp;#8221; &lt;em&gt;horizontally&lt;/em&gt;, rather than vertically. In other words, we can use traits to write methods once and use them in multiple classes, without the multiple inheritance consequence of adding more explicit type information to the classes we modify.&lt;/p&gt;
@@ -92,8 +171,12 @@
   <entry>
     <id>tag:www.zuttonet.com,2011-08-08:/articles/anonymous-recursion-php/</id>
     <title type="html">Anonymous recursion in PHP</title>
-    <published>2011-08-08T06:00:00Z</published>
-    <updated>2011-08-08T06:00:00Z</updated>
+    <published>2011-08-08T07:00:00Z</published>
+    <updated>2011-08-08T07:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-recursion-php/"/>
     <content type="html">&lt;h2&gt;The scenario&lt;/h2&gt;
 &lt;p&gt;You&amp;#8217;re neck deep in 3-year old production code, amazon one-click checkout isn&amp;#8217;t working, and your wife just left you for someone who &amp;#8220;doesn&amp;#8217;t spend so much time writing unit tests.&amp;#8221; You need to save the world by implementing an algorithm using an anonymous function &lt;em&gt;now&lt;/em&gt;. Wait, what if the problem you need to solve is well served with a recursive approach? Maybe you attack the problem optimistically, starting with something like this:&lt;/p&gt;
@@ -121,8 +204,12 @@
   <entry>
     <id>tag:www.zuttonet.com,2011-07-15:/articles/anonymous-functions-and-closure-php/</id>
     <title type="html">Anonymous functions and closure in PHP</title>
-    <published>2011-07-15T06:00:00Z</published>
-    <updated>2011-07-15T06:00:00Z</updated>
+    <published>2011-07-15T07:00:00Z</published>
+    <updated>2011-07-15T07:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/anonymous-functions-and-closure-php/"/>
     <content type="html">&lt;p&gt;&lt;span class="caps"&gt;PHP&lt;/span&gt; 5.3 introduced function literals to the language, providing big benefits in the form of syntax and readability when using and creating functions that accept other functions as arguments. However, the introduction of &lt;a href="http://php.net/manual/en/functions.anonymous.php"&gt;anonymous functions&lt;/a&gt; was paired with another useful language construct which allows us to close over local variables in the same scope as the anonymous function, creating a closure.&lt;/p&gt;
 &lt;h2&gt;What is closure?&lt;/h2&gt;
@@ -169,8 +256,12 @@
   <entry>
     <id>tag:www.zuttonet.com,2011-06-13:/articles/dead-simple-profiling-in-php/</id>
     <title type="html">Simple performance profiling in PHP 5.3</title>
-    <published>2011-06-13T06:00:00Z</published>
-    <updated>2011-06-13T06:00:00Z</updated>
+    <published>2011-06-13T07:00:00Z</published>
+    <updated>2011-06-13T07:00:00Z</updated>
+    <author>
+      <name>Ryan</name>
+      <uri>http://www.zuttonet.com</uri>
+    </author>
     <link rel="alternate" href="http://www.zuttonet.com/articles/dead-simple-profiling-in-php/"/>
     <content type="html">&lt;p&gt;I love finding new ways to use PHP&amp;#8217;s anonymous functions. One thing that caught my attention recently is how they make it so easy to wrap scope and functionality into little packages. These packages can easily be fed to a utility function, allowing the functionality contained therein to be wrapped and modified dynamically.&lt;/p&gt;
 &lt;p&gt;How nice would it be if there were a simple way to wrap up some script execution and figure out how long it takes? Or to take multiple versions of a function&amp;#8212;or class, or whatever&amp;#8212;and figure out which one runs in less time? It would be super nice. Unfortunately, I have never really run across a very &lt;em&gt;simple&lt;/em&gt; way to do that. So I wrote a function, called &lt;code&gt;profile&lt;/code&gt;, which accepts a diagnostic messge and a lambda which wrap around the code you are interested in profiling.&lt;/p&gt;
@@ -180,35 +271,5 @@
 &lt;p&gt;The simple &lt;code&gt;profile&lt;/code&gt; function could be broadened a bit by wrapping the profile function up into a profiling class that would save information about various executions&amp;#8212;maybe even duplicating them and providing statistical information about those runs. The function also makes pretty bold assumptions about how information about the execution time should be packaged; this could certainly use some abstraction. Sounds like a good evening project!&lt;/p&gt;
 &lt;p&gt;Edit: If you&amp;#8217;re interested in this concept at all, might find some use out of a more fully-implemented version&amp;#8212;or would like to contribute&amp;#8212;I&amp;#8217;ve made a github project that does everything in this article in a bit more deptch. &lt;a href="http://www.github.com/rgantt/rolex"&gt;Check it out!&lt;/a&gt;&lt;/p&gt;</content>
     <summary type="html">PHP's standard library makes it pretty easy to whip up a quick set of timing functions to wrap around your code. Maybe I'm jaded by ruby's blocks, but I would love to see that my profiling code is getting everything I want and _only_ those things I want. So I decided to sit down and whip up something quick and simple to alleviate my neurosis.</summary>
-  </entry>
-  <entry>
-    <id>tag:www.zuttonet.com,2011-06-07:/articles/setting-up-a-nanoc-website/</id>
-    <title type="html">nanoc websites with binary data</title>
-    <published>2011-06-07T06:00:00Z</published>
-    <updated>2011-06-07T06:00:00Z</updated>
-    <link rel="alternate" href="http://www.zuttonet.com/articles/setting-up-a-nanoc-website/"/>
-    <content type="html">&lt;p&gt;Nanoc is fantastic. I would definitely recommend it to anyone. However, any time I approach something new on a computer, there&amp;#8217;s always a struggle between the information available in the documentation (typically written by the developer, who already knows what&amp;#8217;s up) and the information I really need to know to use the software.&lt;/p&gt;
-&lt;h2&gt;Minor frustrations&lt;/h2&gt;
-&lt;p&gt;The first thing that tripped me up about nanoc was how best to handle my images and other binary files. I think the documentation talks about binary files a bit, but I was left a little confused even after several reads through. I knew that the standard nanoc metadata couldn&amp;#8217;t simply be added to the top of the file, but I had trouble figuring out how to get the files where I wanted them to go. A little trial and error helped, but the biggest breakthrough came after I worked with the process as a whole. What follows here is an example of my compilation and routing rules for my basic images and the rest of the files on my site.&lt;/p&gt;
-&lt;h2&gt;Compilation and routing&lt;/h2&gt;
-&lt;p&gt;Basically, nanoc consists of two steps: compilation and routing.&lt;/p&gt;
-&lt;h3&gt;Compilation&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Compilation&lt;/strong&gt;, the way I see it, is the process of taking particular items (this is actually how they&amp;#8217;re called in nanoc parlance) and transforming their contents according to specific rules. These rules are created by you. To help you, nanoc provides a bunch of built-in helpers (nicely packaged functionality for generating stuff on your site) and filters (formatting rules, etc, through which your pages are run&amp;#8212;e.g. markdown, textile) while exposing a simple api for accessing each item as given. Compilation can be as complicated as translating into another language or as simple as a pass-through. The articles on this site, for example, are simply passed through RedCloth (a Ruby textile implementation) and written.&lt;/p&gt;
-&lt;h3&gt;Routing&lt;/h3&gt;
-&lt;p&gt;After all of the items are compiled and linked, they&amp;#8217;re routed. &lt;strong&gt;Routing&lt;/strong&gt; is the process of actually putting the compiled files where they need to go. Routing rules match item identifiers (in the same way that compilation rules do) and allow you to return a string different than the identifier itself. Ultimately, the item placed in a subdirectory &lt;code&gt;/output/&lt;/code&gt; according to the string you return in the routing rule matching that file. Routing &lt;code&gt;/foo/&lt;/code&gt; to &lt;code&gt;/pages/foo/&lt;/code&gt; for example, will cause the output file to be placed in &lt;code&gt;pages/foo/index.html&lt;/code&gt; instead of &lt;code&gt;foo/index.html&lt;/code&gt; by default. You could also route &lt;code&gt;/foo/&lt;/code&gt; to &lt;code&gt;/foo.html&lt;/code&gt; if you wanted. The routing rule is given an item object to work with, which includes data about the identifier, the path, the extension, and other things.&lt;/p&gt;
-&lt;h2&gt;Examples&lt;/h2&gt;
-&lt;p&gt;Here&amp;#8217;s a subset of the compilation and routing rules I use for the index page and the articles for this website:&lt;/p&gt;
-&lt;script src="https://gist.github.com/1012755.js?file=compile_and_route_articles.rb"&gt;&lt;/script&gt;&lt;h3&gt;Root pages&lt;/h3&gt;
-&lt;p&gt;First first rule catches the html files in the content/ directory, filters them through &lt;code&gt;:erb&lt;/code&gt; (the standard filter you&amp;#8217;d want to apply if you were doing any sort of ruby &lt;span class="caps"&gt;ERB&lt;/span&gt; markup in the page). Since I want to build my index.html to dynamically list the most recent articles using Ruby, this is the appropriate filter. Then I apply the &lt;code&gt;page&lt;/code&gt; layout (which is another erb file located in &lt;code&gt;layouts/&lt;/code&gt;). Once a file has matched a compilation rule, it won&amp;#8217;t be run through any others.&lt;/p&gt;
-&lt;h3&gt;Articles&lt;/h3&gt;
-&lt;p&gt;Articles follow the same basic guideline, except they&amp;#8217;re filtered through &lt;code&gt;:redcloth&lt;/code&gt; (the textile filter) since they contain no &amp;#8220;dynamic&amp;#8221; content. I say &amp;#8220;dynamic&amp;#8221; because even the &lt;code&gt;:erb&lt;/code&gt; stuff from above becomes static &lt;span class="caps"&gt;HTML&lt;/span&gt; during the compilation process. The &lt;code&gt;article&lt;/code&gt; layout is applied to these files. Both root pages and articles are then simply routed based on their identifiers (so their relative directory structure does not change).&lt;/p&gt;
-&lt;h3&gt;Images&lt;/h3&gt;
-&lt;p&gt;Now, Back to images: images require no compilation, because (in some sense) they&amp;#8217;re already compiled. In fact, if we want to avoid problems during our file compilation process, we will need to &lt;em&gt;prevent&lt;/em&gt; any sort of compilation from being done to them. The easiest way to do this is to set up an empty rule; a rule block that does nothing. Failure to do this will result in the images being compiled by your default rule; if this default rule does anything that might break on a binary file, the whole compilation process will fail.&lt;/p&gt;
-&lt;p&gt;After passing through the compilation process, binary files must be routed to their final destination. In my situation, I wanted to be able to access all of my images with a route (or absolute &lt;span class="caps"&gt;URI&lt;/span&gt;) that resembled &lt;code&gt;"/images/name.ext"&lt;/code&gt;. Easy enough-I set up a rule that routes all files in the &lt;code&gt;/content/images&lt;/code&gt; directory of my nanoc install to &lt;code&gt;/output/images/name.ext&lt;/code&gt; (including any subdirectory names).&lt;/p&gt;
-&lt;p&gt;Here are the compilation and routing rules I use for basic images on this website:&lt;/p&gt;
-&lt;script src="https://gist.github.com/1012755.js?file=compile_and_route_images.rb"&gt;&lt;/script&gt;&lt;p&gt;Looking at the routing rules, it might seem like nanoc is just wasting time-after all, why would I not just put the files in the output structure that I want to begin with? The real value in the routing defaults, as I see it, is that nanoc prefers to rename files to &lt;code&gt;index.html&lt;/code&gt; and place them in a subdirectory that corresponds to the old filename. This is useful, because instead of having to type a url like: &lt;code&gt;zuttonet.com/pages/contact.html&lt;/code&gt;, you can simply make your request for &lt;code&gt;zuttonet.com/pages/contact&lt;/code&gt; instead (provided that &lt;code&gt;index.html&lt;/code&gt; is set as your web server&amp;#8217;s default file to serve when a directory is requested). Pretty cool!&lt;/p&gt;
-&lt;h3&gt;Conclusion&lt;/h3&gt;
-&lt;p&gt;nanoc is great for setting up a small-to-medium sized website that really doesn&amp;#8217;t need to serve dynamic content. Blogs come straight to mind. Adding comments and trackbacks to a static nanoc website is as easy as setting up a disqus account and plopping some async code in your template. Have fun!&lt;/p&gt;</content>
-    <summary type="html">nanoc is a wonderful little gem that uses Ruby/ERB to create statically-generated websites. It saves you the trouble of firing up a database connection on every request while still allowing you the flexibility of Ruby to generate your sites. I wrote a quick walkthrough to bridge the gap between what I learned through the nanoc documentation and what I needed to know to finish converting my own site.</summary>
   </entry>
 </feed>

@@ -1,0 +1,154 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+	<head>
+		<title>Zutto development - The prefix tree: an easily-sortable map implementation for string keys</title>
+
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="author" content="Ryan Gantt">
+		<meta name="description" content="Web development blog focusing on PHP">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		
+		<link href='http://fonts.googleapis.com/css?family=Numans' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" type="text/css" media="screen" href="/css/common.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="/css/article.css">
+		<link rel="shortcut icon" href="/images/favicon.ico">
+
+		<script src="/js/libs/modernizr-2.0.6.min.js"></script>
+	</head>
+
+
+	<body>
+		<a name="top"></a>
+		
+		<div id="top_mid"></div>
+		<ul id="menu">
+			<li><a href="/">articles</a></li>
+			<li><a href="/pages/contact">about me</a></li>
+			<li><a href="http://www.github.com/rgantt">fork me on GitHub</a></li>
+		</ul>
+
+		<div id="middle_content_half">
+			<div id="middle_left_half"></div>
+			<div id="middle_right_half"></div>
+		</div>
+
+		<div id="middle_content_half_lower"></div>
+
+		<div id="middle_content_half_mid"></div>
+
+			<div id="content-sub">            
+                <article>
+                    <h1>The prefix tree: an easily-sortable map implementation for string keys</h1>
+                    <h3>By Ryan in <a href="http://technorati.com/tag/java" rel="tag">java</a>, <a href="http://technorati.com/tag/javascript" rel="tag">javascript</a>, <a href="http://technorati.com/tag/data structure" rel="tag">data structure</a>, <a href="http://technorati.com/tag/map" rel="tag">map</a>, <a href="http://technorati.com/tag/trie" rel="tag">trie</a>, <a href="http://technorati.com/tag/sorting" rel="tag">sorting</a>, <a href="http://technorati.com/tag/prefix tree" rel="tag">prefix tree</a>, <a href="http://technorati.com/tag/tree" rel="tag">tree</a></h3>
+                    
+                    <p>One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.</p>
+<h2>Overview</h2>
+<p>A prefix tree&#8212;or, more commonly, trie, for re<em>trie</em>val&#8212;is a data structure optimized to store values associated with a string key. Tries are useful because they allow fast (<code>O(L)</code>, where <code>L</code> is the length of the word) lookup on string keys, scale easily for large collections of small, short words, and (in many easy implementations) provide built-in lexicographical sorting on traversal.</p>
+<p>Being a <code>Map</code>, prefix trees support at least the <code>put(K key, V value)</code>, <code>get(K key)</code>, and <code>delete(K key)</code> operations. In addition, it is very simple (and desirable) to also support <code>traverse()</code>, particularly for an in-order (and therefore lexicographically-ordered) traversal.</p>
+<p>Despite the fact that, in a basic trie, the value of each node will contain only one character, the type <code>K</code> of the key is typically <code>String</code>. Implementations worry about how to allocate the component parts of that string across nodes internally. Most simply, they will be allocated letter-by-letter, although some implementations chunk substrings on nodes that have one or fewer children.</p>
+<h2>Internal structure</h2>
+<p>Each node of a prefix tree represents a letter in a word, except for the root node, which contains a pointer to all possible word starts. In other words, each node (including the root), has up to 27 children (one for each letter of the alphabet, plus another for a possible leaf node which contains a value).</p>
+<p>Traversing downward, a word can be constructed by following any path from the root down to a leaf node. Note that even nodes that contain a leaf node as a child may be substrings of other words; the implementations of <code>get</code> and <code>put</code> give meaning to this, not the structure of the trie itself.</p>
+<p>Below is a graphical representation of a trie that contains the following set of words: <code>am</code>, <code>and</code>, <code>cat</code>.</p>
+<p><img src="/images/articles/tries/simple_trie.png" alt="" /></p>
+<p>You can see that since <code>am</code> and <code>and</code> share a prefix, we reduce space usage by only having to store the <code>a</code> one time.</p>
+<h2>Implementation algorithms</h2>
+<p>Prefix trees are just that: trees. For the sake of simplicity, let&#8217;s assume that our trie stores <span class="caps">ASCII</span> words. In that case, each node in our tree has 27 children. With 27 children to manage, we need to consider what kind of data structure to use. Using a list would be fine (since list implementations abound), but lookup is slow (and insertion into a sorted list is slow). We could use an array and rely on translating between characters and integers to make the indexing work. Instead, let&#8217;s use a <code>TreeMap</code>. This will give us quick lookup and insertion on the character keys (<code>O(log n)</code>, where <code>n</code> is the number of children, which is at most 27).</p>
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=node.java"></script><p>Our prefix tree is composed of <code>Node</code> objects that contain <code>String</code> keys and values of type <code>V</code>, which is a type-parameter of our <code>Trie</code> class. Now let&#8217;s walk through some simple implementations of the operations we need to support.</p>
+<h3>get</h3>
+<p>Retrieving the value for a given key within a trie (if it exists), is simple:</p>
+<p>1. Grab the first letter of the key; call it <code>k</code><br />
+2. Get a pointer to the child of the current node whose key matches <code>k</code><br />
+3. If the child is <code>null</code>, return <code>null</code><br />
+4. Else if the key and <code>k</code> are equal (i.e. the key has length 1), return the child&#8217;s value <code>V</code><br />
+5. Else <code>get</code> the value of the remainder of the key, rooted at the child</p>
+<p>Here&#8217;s an implementation of the above algorithm:</p>
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=get.java"></script><h3>put</h3>
+<p>Trie insertion follows a very similar process to retrieval. Instead of failing early on <code>null</code> children, though, insertion creates the children required for each letter of the key. Then, when there are no keys left, the final child is assigned a value (turning it into a leaf).</p>
+<p>Here&#8217;s the process:</p>
+<p>1. Grab the first letter of the key; call it <code>k</code><br />
+2. Get a pointer to the child of the current node whose key matches <code>k</code><br />
+3. If the child is <code>null</code>, create a new <code>Node</code> with key <code>k</code> and add it as a child to the current node<br />
+4. If the key and <code>k</code> are equal (i.e. the key has length 1), assign the child&#8217;s value <code>V</code><br />
+4. Else <code>put</code> the value of the remainder of the key, rooted at the child</p>
+<p>Here&#8217;s an implementation of the above algorithm:</p>
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=put.java"></script><h3>delete</h3>
+<p>Unlike insertion and retrieval, which I&#8217;ve implemented above recursively, I decided to take a slightly different approach for removal. Trie removal has some slightly more subtle edge cases that need to be accounted for. To do so effectively, I opt to traverse the entire key from root to leaf, pushing the nodes onto a stack as I do. Then, by popping elements off the stack, I&#8217;m able to move from the leaf toward the root and handle the edge cases without worrying about recursion.</p>
+<p>The algorithm goes like this:</p>
+<p>1. For a given key, save a list of nodes that represents the path from the root to a leaf<br />
+2. If the path reaches a leaf other than the one representing the key, return null<br />
+3. Start at the leaf. Set its value to null.<br />
+4. While there is path left to traverse and we aren&#8217;t looking at vapid nodes,<br />
+4. a. Remove those nodes from their parent</p>
+<p>By &#8220;vapid&#8221; node in this case, I mean nodes whose values are null and who have no children. These are nodes that should be culled from the trie, otherwise they will contribute unnecessary runtime to subsequent tree traversals, insertions, and deletions.</p>
+<p>Here&#8217;s an implementation of the above algorithm.</p>
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=delete.java"></script><p>Note that this implementation relies on a helper, <code>pathFromLeaf(Stack, String)</code>. I&#8217;ve omitted the implementation of that helper in this example, but you can find it on <a href="https://gist.github.com/rgantt/5711830">github</a>.</p>
+<h3>traverse</h3>
+<p>Traversal can also be easily implemented recursively. The tricky part about getting the recursion right on traversal is figuring out when a word should be added to the list, and what subkey should pushed into the recursive call.</p>
+<p>We can describe the steps like this:</p>
+<p>1. If the current node has a non-null value, prefix and we should add it to the list<br />
+2. For each of the current node&#8217;s children with non-null keys, append those keys to prefix and traverse them</p>
+<p>We start the call at the root with an empty list.</p>
+<p>Here&#8217;s an implementation:</p>
+<script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=traverse.java"></script><p>In order to ensure that we are getting the keys back in alphabetical order, we perform a pre-order traversal.</p>
+<h2>Time complexity</h2>
+<p>Like mentioned previously, prefix trees are well suited to lookups on string keys. Let&#8217;s walk through an example.</p>
+<p>Assume that we have a well-populated tree with many overlapping keys. Now we call <code>get</code> with key <code>"cab"</code>, which exists in the trie. Working our way through the algorithm implemented above, we will look for the child of the root node that has the key <code>c</code>. In our implementation, this lookup happens in <code>O(log c)</code> time (because of our choice of <code>TreeMap</code> instead of <code>HashMap</code> to take advantage of the ordering property of binary trees), where <code>c</code> is the number of characters in the tree; this is at most 26. Note that if we used a <code>HashMap</code> or array instead, this lookup would happen in <code>O(1)</code> time. For small <code>c</code> this is hardly worth mentioning.</p>
+<p>The time complexity we are interested in, though, is not a function of the number of children of a given node, but a function of the number of words mapped in the trie itself. The <code>O(log c)</code> lookup mentioned above occurs once for each character in the string key. So the lookup time is directly proportional to the length of the string, but effectively constant in terms of the number of elements mapped in the trie&#8212;<code>O(1)</code>.</p>
+<h2>Final thoughts</h2>
+<p>Prefix trees are a nice data structure that&#8217;s especially tailored for mapping words to values. You get all of the benefits of the map type interface, and none of the costs of collisions that are inevitable as the number of mappings a hash table stores increases.</p>
+<h3>Implementation trade-offs</h3>
+<p>1. How would the time complexity change if we used a data structure other than a <code>TreeMap</code> to store a node&#8217;s children? Under what circumstances is that trade-off worth making?</p>
+<h2>References</h2>
+<ul>
+	<li><a href="https://gist.github.com/rgantt/5711830">Complete implementation (including unit tests) of this example</a></li>
+	<li><a href="https://github.com/rgantt/jsterbate/blob/master/lib/trie.js">Implementation of a prefix tree in Javascript</a></li>
+</ul>
+					
+					Enjoy this article? <a href="http://twitter.com/ganttr" class="twitter-follow-button" data-show-count="false">Follow @ganttr</a>
+					<hr />
+					
+					<div id="disqus_thread"></div>
+					<script type="text/javascript">
+						var disqus_shortname = 'zuttonet';
+						var disqus_identifier = '/articles/introduction-to-prefix-trees/';
+						var disqus_url = 'http://www.zuttonet.com/articles/introduction-to-prefix-trees/';
+
+						(function() {
+							var dsq = document.createElement('script'); 
+							dsq.type = 'text/javascript'; 
+							dsq.async = true;
+							dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+							(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+						})();
+					</script>
+					<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments</a>.</noscript>
+                </article>
+
+			<footer>
+				<span>All content copyright Zutto LLC, 2007-2011.</span>
+				<a href="#top">#TOP</a>
+			</footer>
+			</div>
+
+		<!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if offline -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script>window.jQuery || document.write('<script src="/js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+
+		<script defer src="/js/plugins.js"></script>
+		<script defer src="/js/script.js"></script>
+
+		<script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+		
+		<script>
+			window._gaq = [['_setAccount','UA-2356219-1'],['_trackPageview'],['_trackPageLoadTime']];
+			Modernizr.load({
+				load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
+			});
+		</script>
+	</body>
+</html>
