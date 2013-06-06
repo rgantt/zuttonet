@@ -4,10 +4,12 @@ title: "The prefix tree: an easily-sortable map implementation for string keys"
 tags: [ 'java', 'javascript', 'data structure', 'map', 'trie', 'sorting', 'prefix tree', 'tree' ]
 created_at: Time.parse( "June 5, 2013" )
 author_name: Ryan
-excerpt: One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.
+excerpt: Prefix trees (tries) provide lookup, insertion, and deletion speeds that are proportional to the length of the key being mapped, rather than the amount of data stored in the structure. They outperform typical map implementations, whose runtimes are linear in the number of elements in the worst case as they deal with hash collisions and dynamic resizing. They can be used in a variety of situtations, but tend to work really nicely in user interfaces; autocomplete and simple spell check come to mind. The best part about prefix trees is that their implementation algorithms are fairly straightforward.
 ---
 
-One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, data stored in a hash table makes no guarantee about order. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data. Prefix trees (tries) provide a trade-off between insertion, deletion, and sorting speed by breaking up data into smaller chunks and allowing nodes to have many children. By doing this, they offer a convenient representation of strings that can be easily used in applications like spellcheck and auto-complete.
+One common implementation of the map abstract data type, a hash table, provides fast lookup, insertion, and deletion. Unfortunately, the typical implementation involving an array with keys mapped to indices according to a hashing function makes no guarantee about ordering on traversal. Even binary tree-based implementations, with their natural sorting, are not optimized around sorting stored data.
+
+Prefix trees (tries) provide lookup, insertion, and deletion speeds that are proportional to the length of the key being mapped, rather than the amount of data stored in the structure. They outperform typical map implementations, whose runtimes are linear in the number of elements in the worst case as they deal with hash collisions and dynamic resizing. They can be used in a variety of situtations, but tend to work really nicely in user interfaces; autocomplete and simple spell check come to mind. The best part about prefix trees is that their implementation algorithms are fairly straightforward.
 
 h2. Overview
 
@@ -19,27 +21,35 @@ Despite the fact that, in a basic trie, the value of each node will contain only
 
 h2. Internal structure
 
-Each node of a prefix tree represents a letter in a word, except for the root node, which contains a pointer to all possible word starts. In other words, each node (including the root), has up to 27 children (one for each letter of the alphabet, plus another for a possible leaf node which contains a value).
+Each node of a prefix tree represents a letter in a word, except for the root node, which contains a pointer to all possible word starts. In other words, each node (including the root), has up to 26 children (one for each letter of the alphabet). Each word culminates in a node that contains a value in addition to a key; this is referred to as a leaf node.
 
-Traversing downward, a word can be constructed by following any path from the root down to a leaf node. Note that even nodes that contain a leaf node as a child may be substrings of other words; the implementations of <code>get</code> and <code>put</code> give meaning to this, not the structure of the trie itself.
+Traversing downward from the root, a word can be constructed by following any path to a leaf node. Note that even nodes that contain a leaf node as a child may be substrings of other words; the implementations of <code>get</code> and <code>put</code> give meaning to this, not necessarily the node structure of the trie itself. This is true of the trie we construct below, but implementations will vary.
 
 Below is a graphical representation of a trie that contains the following set of words: <code>am</code>, <code>and</code>, <code>cat</code>.
 
 !=/images/articles/tries/simple_trie.png!
 
-You can see that since <code>am</code> and <code>and</code> share a prefix, we reduce space usage by only having to store the <code>a</code> one time.
+You can see that since <code>am</code> and <code>and</code> share a prefix, we reduce space usage by only having to store the <code>a</code> one time. By starting at the root, we can follow paths to the leaves to construct the words.
 
 h2. Implementation algorithms
 
-Prefix trees are just that: trees. For the sake of simplicity, let's assume that our trie stores ASCII words. In that case, each node in our tree has 27 children. With 27 children to manage, we need to consider what kind of data structure to use. Using a list would be fine (since list implementations abound), but lookup is slow (and insertion into a sorted list is slow). We could use an array and rely on translating between characters and integers to make the indexing work. Instead, let's use a <code>TreeMap</code>. This will give us quick lookup and insertion on the character keys (<code>O(log n)</code>, where <code>n</code> is the number of children, which is at most 27).
+Prefix trees are just that: trees. A root node that contains child nodes that contain child nodes. Therefore, a good node in which to hold our key, an optional value for leaf nodes, and a way to interact with children is vital to our final implementation.
+
+For the sake of simplicity, let's assume that our trie stores ASCII words. In that case, each node in our tree can have up to 26 children. With so many children to manage, we need to consider what kind of data structure to use. Using a list would be fine, but lookup is slow and insertion into a sorted list is slow. 
+
+Instead, we could use an array and rely on translating between characters and integers to make the indexing work. This is a fine implementation (see the javascript version in the references), but we can take advantage of an existing data structure to avoid some pitfalls of manually messing around in an array.
+
+To hold children, let's use a <code>TreeMap</code>. Being a map implementation, this will give us quick lookup and insertion on the character keys: <code>O(log n)</code>, where <code>n</code> is the number of children. It has the added benefit of storing our children in alphabetical order, which will prove extremely useful when we implement an in-order traversal later. This alphabetical ordering on the children will translate directly into lexicographical order on the keys.
 
 <script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=node.java"></script>
 
-Our prefix tree is composed of <code>Node</code> objects that contain <code>String</code> keys and values of type <code>V</code>, which is a type-parameter of our <code>Trie</code> class. Now let's walk through some simple implementations of the operations we need to support.
+Our prefix tree is composed of <code>Node</code> objects that contain <code>String</code> keys and values of type <code>V</code>, which is a type-parameter of our <code>Trie</code> class.
+
+Now that our node is defined, let's walk through some simple implementations of the operations we need to support. The curious and wonderful thing about a trie is that <code>get</code>, <code>put</code>, and <code>delete</code> are all roughly the same level of complexity. This is in contrast to a map, which has potentially complicated edge-case handling in <code>put</code> and <code>remove</code>, and relatively straight-forward extractions on <code>get</code>.
 
 h3. get
 
-Retrieving the value for a given key within a trie (if it exists), is simple:
+Retrieving the value for a given key within a trie (if it exists), is simple. Starting at the root:
 
 1. Grab the first letter of the key; call it <code>k</code>
 2. Get a pointer to the child of the current node whose key matches <code>k</code>
@@ -55,7 +65,7 @@ h3. put
 
 Trie insertion follows a very similar process to retrieval. Instead of failing early on <code>null</code> children, though, insertion creates the children required for each letter of the key. Then, when there are no keys left, the final child is assigned a value (turning it into a leaf).
 
-Here's the process:
+Starting at the root:
 
 1. Grab the first letter of the key; call it <code>k</code>
 2. Get a pointer to the child of the current node whose key matches <code>k</code>
@@ -85,7 +95,7 @@ Here's an implementation of the above algorithm.
 
 <script src="https://gist.github.com/rgantt/61c1049eb7b650e32043.js?file=delete.java"></script>
 
-Note that this implementation relies on a helper, <code>pathFromLeaf(Stack, String)</code>. I've omitted the implementation of that helper in this example, but you can find it on "github":https://gist.github.com/rgantt/5711830.
+Note that this implementation relies on a helper, <code>pathFromLeaf(Stack, String)</code>. I've omitted the implementation of that helper in this example, but you can find it "here":https://gist.github.com/rgantt/5711830.
 
 h3. traverse
 
